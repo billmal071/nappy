@@ -43,6 +43,7 @@
 		@include('errors.errors-forms')
 
           	<form action="{{{ url('register') }}}" method="post" name="form" id="signup_form">
+		@captcha
 
             <input type="hidden" name="_token" value="{{{ csrf_token() }}}">
 
@@ -94,7 +95,7 @@
         	</div>
         </div><!-- row -->
 
-           <button type="submit" id="buttonSubmitRegister" class="btn btn-block btn-lg btn-main custom-rounded">{{{ trans('auth.sign_up') }}}</button>
+	   <button type="submit" id="buttonSubmitRegister" class="btn btn-block btn-lg btn-main custom-rounded">{{{ trans('auth.sign_up') }}}</button>
 
            @if( $settings->facebook_login == 'on' || $settings->twitter_login == 'on' )
      			<span class="login-link auth-social" id="twitter-btn-text">{{ trans('auth.or_sign_in_with') }}</span>

@@ -5,4 +5,4 @@
 CHANGELOG.md export-ignore
 
 /public/temp export-ignore
-/public/uploads export-ignore
+/public;/uploads export-ignore

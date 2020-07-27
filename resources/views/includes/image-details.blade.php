@@ -263,7 +263,8 @@
                                 <span class="label label-default myicon-right">{{$_size}}</span> {{$stock->resolution}} 
                                 <span class="pull-right">{{$stock->size}}</span>
                             </a> --}}
-                            @if (Auth::check())
+			    {{-- @if (Auth::check()) --}}
+                    	    @if ($response->item_for_sale == 'free')
                                 <button onclick="downloadAjax(this);" data-img-url="{{url('download',$stock->token)}}/{{$stock->type}}" data-img-id="{{$response->id}}">
                                     <span class="label label-default myicon-right">{{$_size}}</span> {{$stock->resolution}} &nbsp;
                                     <span class="pull-right">{{$stock->size}}</span>
@@ -501,7 +502,14 @@
                             a.download = response.name;
                             document.body.appendChild(a);
                             a.click();
-                            window.URL.revokeObjectURL(url);
+
+			    // adding this avoids webkitblobresource error 1
+			    setTimeout(function() {
+                              window.URL.revokeObjectURL(url);
+			      document.body.removeChild(a);
+			    }, 1000);
+
+                            // window.URL.revokeObjectURL(url);
 
                             $('.download_' + imgId).html(response.count);
                         })

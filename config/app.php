@@ -147,16 +147,16 @@ return [
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
 
-        Intervention\Image\ImageServiceProvider::class,
-    		Collective\Html\HtmlServiceProvider::class,
-    		Laravel\Cashier\CashierServiceProvider::class,
-    		Stevebauman\Purify\PurifyServiceProvider::class,
-        KingFlamez\Rave\RaveServiceProvider::class,
-        Chumper\Zipper\ZipperServiceProvider::class,
-
         /*
          * Package Service Providers...
          */
+	AlbertCht\InvisibleReCaptcha\InvisibleReCaptchaServiceProvider::class,
+        Intervention\Image\ImageServiceProvider::class,
+	Collective\Html\HtmlServiceProvider::class,
+	Laravel\Cashier\CashierServiceProvider::class,
+	Stevebauman\Purify\PurifyServiceProvider::class,
+        KingFlamez\Rave\RaveServiceProvider::class,
+        Chumper\Zipper\ZipperServiceProvider::class,
 
         /*
          * Application Service Providers...

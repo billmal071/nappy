@@ -45,5 +45,10 @@
     RewriteCond %{THE_REQUEST} ^GET.*index\.php [NC]
     RewriteRule (.*?)index\.php/*(.*) /$1$2 [R=301,NE,L]
 
+    # ssl
+    RewriteEngine On 
+    RewriteCond % 80 
+    RewriteRule ^(.*)$ https://beta.nappy.co/$1 [R,L]
+
 
 </IfModule>
