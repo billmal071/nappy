@@ -36,9 +36,9 @@ return [
     ],
 
     'facebook' => [
-      'client_id' => "APP_ID", // configure with your app id
-      'client_secret' => 'APP_SECRET', // your app secret
-      'redirect' => 'http://YOURSITE.COM/oauth/facebook/callback', // IMPORTANT NOT REMOVE /oauth/facebook/callback
+      'client_id' => env('FACEBOOK_APP_ID'), // configure with your app id
+      'client_secret' => env('FACEBOOK_APP_SECRET'), // your app secret
+      'redirect' => 'https://beta.nappy.co/oauth/facebook/callback', // IMPORTANT NOT REMOVE /oauth/facebook/callback
       ],
 
     'twitter' => [
