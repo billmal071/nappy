@@ -7,7 +7,8 @@ use Validator;
 use App\Models\AdminSettings;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Mail;
+use Illuminate\Support\Facades\Mail;
+//use Mail;
 
 class RegisterController extends Controller
 {

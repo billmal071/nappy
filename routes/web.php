@@ -19,6 +19,12 @@ Route::get('home', function(){
 	return redirect('/');
 });
 
+Route::get('send_test_email', function(){
+	Mail::raw('Sending emails with Mailgun and Laravel is easy!', function($message)
+	{
+		$message->to('nappystudiodev@gmail.com');
+	});
+});
 
 /*
  |-----------------------------------
