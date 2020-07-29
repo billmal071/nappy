@@ -12,6 +12,7 @@ use App\Models\AdminSettings;
 use App\Models\Categories;
 use App\Models\Query;
 use App\Models\Collections;
+use Mail;
 
 
 class HomeController extends Controller
@@ -47,6 +48,9 @@ class HomeController extends Controller
 
     public function getVerifyAccount( $confirmation_code ) {
 
+	    $settings = AdminSettings::first();
+	    $_email_noreply = $settings->email_no_reply;
+	    $_title_site = $settings->title;
 
         if( Auth::guest()
         || Auth::check()
@@ -63,7 +67,11 @@ class HomeController extends Controller
 
 
             Auth::loginUsingId($user->id);
-
+	    Mail::send('emails.welcome', array('user' => $user), function($message) use ($_email_noreply, $_title_site, $user) {
+		    $message->from($_email_noreply, $_title_site);
+		    $message->subject(trans('users.welcome'));
+		    $message->to($user->email, $user->username);
+	    });
              return redirect('/')
                     ->with([
                         'success_verify' => true,

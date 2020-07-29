@@ -71,4 +71,5 @@ return array(
     'delete_all_notifications' => 'Delete all notifications',
     'user_no_images' => 'There are no photos to display',
     'submit'                    => 'Submit',
+    'welcome'			=> 'Welcome to Nappy!',
 );
