@@ -73,4 +73,6 @@ return array(
     'submit'                    => 'Submit',
     'welcome'			=> 'Welcome to Nappy!',
     'featured_photo'		=> 'Your Photo is now featured in  Nappy Website!',
+    'photo_approved'		=> 'Your Photo has been approved',
+    'photo_pending'		=> 'Your Photo has been uploaded, awaiting for approval',
 );

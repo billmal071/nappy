@@ -21,6 +21,7 @@ use League\ColorExtractor\ColorExtractor;
 use League\ColorExtractor\Palette;
 use Image;
 use App\Models\Purchases;
+use Mail;
 
 
 class ImagesController extends Controller {
@@ -303,6 +304,21 @@ class ImagesController extends Controller {
         $sql->item_for_sale        = $request->item_for_sale ? $request->item_for_sale: 'free';
 
         $sql->save();
+
+	$recipient = User::join('images', 'users.id', '=', 'images.user_id')
+			->select('users.email', 'users.username')
+			->where('images.user_id', $sql->user_id)
+			->first();
+	$username = $recipient->username;
+	$user_email = $recipient->email;
+	$_title_site = $this->settings->title;
+	$_email_noreply = $this->settings->email_no_reply;
+
+	Mail::send('emails.pending', array('photo_title' => $sql->title, 'username' => $username, 'photo_id' => $sql->id), function($message) use ($username, $user_email, $_title_site, $_email_noreply) {
+		$message->from($_email_noreply, $_title_site);
+		$message->subject(trans('users.photo_pending'));
+		$message->to($user_email, $username);
+	});
 
         // ID INSERT
         $imageID = $sql->id;
