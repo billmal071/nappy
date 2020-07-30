@@ -523,7 +523,7 @@ class AdminController extends Controller {
 
 		$this->validate($request, $rules);
 
-	    $sql->title         = $request->title;
+		$sql->title         = $request->title;
 		$sql->description   = $request->description;
 		$sql->tags          = $request->tags;
 		$sql->categories_id = $request->categories_id;
@@ -537,6 +537,13 @@ class AdminController extends Controller {
 
 
 		$sql->save();
+		if($sql->status == 'active') {
+			Mail::send('emails.approve', array('photo_title' => $photo_title, 'username' => $username, 'photo_id' => $photo_id), function($message) use ($user_email, $username, $_title_site, $_email_noreply) {
+				$message->from($_email_noreply, $_title_site);
+				$message->subject(trans('users.photo_approve'));
+				$message->to($user_email, $username);
+			});
+		}
 	    \Session::flash('success_message', trans('admin.success_update'));
 
 	    return redirect('panel/admin/images');
