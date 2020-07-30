@@ -494,9 +494,27 @@ class AdminController extends Controller {
 	        'tags'        => 'required',
 
         );
+		$_title_site = $this->settings->title;
+		$_email_noreply = $this->settings->email_no_reply;
+
+		$user_id = $sql->user_id;
+		$recipient = User::join('images', 'users.id', '=', 'images.user_id')
+				->select('users.email', 'users.username')
+				->where('images.user_id', $user_id)
+				->first();
+		$username = $recipient->username;
+		$user_email = $recipient->email;
+		$photo_title = $sql->title;
+		$photo_id = $sql->id;
 
 		if( $request->featured == 'yes' && $sql->featured == 'no' ) {
 			$featuredDate = \Carbon\Carbon::now();
+
+			Mail::send('emails.featured', array('photo_title' => $photo_title, 'username' => $username, 'photo_id' => $photo_id), function($message) use ($user_email, $username, $_title_site, $_email_noreply) {
+				$message->from($_email_noreply, $_title_site);
+				$message->subject(trans('users.featured_photo'));
+				$message->to($user_email, $username);
+			});
 		} elseif( $request->featured == 'yes' && $sql->featured == 'yes' ) {
 			$featuredDate = $sql->featured_date;
 		} else {
@@ -519,7 +537,6 @@ class AdminController extends Controller {
 
 
 		$sql->save();
-
 	    \Session::flash('success_message', trans('admin.success_update'));
 
 	    return redirect('panel/admin/images');

@@ -72,4 +72,5 @@ return array(
     'user_no_images' => 'There are no photos to display',
     'submit'                    => 'Submit',
     'welcome'			=> 'Welcome to Nappy!',
+    'featured_photo'		=> 'Your Photo is now featured in  Nappy Website!',
 );
