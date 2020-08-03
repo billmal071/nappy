@@ -410,8 +410,8 @@ Route::group(['middleware' => 'role'], function() {
 	);
 
 	// BULK UPLOAD
-	Route::get('panel/admin/bulk-upload','bulkUploadController@bulkUpload');
-	Route::post('panel/admin/bulk-upload','bulkUploadController@bulkUploadStore');
+	Route::get('panel/admin/bulk-upload','BulkUploadController@bulkUpload');
+	Route::post('panel/admin/bulk-upload','BulkUploadController@bulkUploadStore');
 
 	// THEME
 	Route::get('panel/admin/theme','AdminController@theme');
