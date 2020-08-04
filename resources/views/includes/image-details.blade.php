@@ -199,7 +199,7 @@
                         </span>
                     </a>
                 @else
-                    <a href="{{url('login')}}" class="btn btn-sm btnLike text-label action-btn likeButton">
+                    <a href="{{url('login')}}" class="btn btn-sm btnLike text-label action-btn">
                         <span class="btn-block text-center textLike">
                             <i class="fa fa-heart-o text-center color-red"></i>
                             <span class="textLike text-muted like-word"> {{trans('misc.like')}}</span>
