@@ -64,15 +64,15 @@
 
 @if (Route::currentRouteName() != 'photo-details')
 <meta property="og:type" content="website" />
-<meta property="og:image:width" content="{{App\Helper::getWidth('public/uploads/preview/'.$response->preview)}}"/>
-<meta property="og:image:height" content="{{App\Helper::getHeight('public/uploads/preview/'.$response->preview)}}"/>
+<meta property="og:image:width" content="{{App\Helper::getWidth(Storage::disk('s3')->url(config('path.preview').$response->preview))}}"/>
+<meta property="og:image:height" content="{{App\Helper::getHeight(Storage::disk('s3')->url(config('path.preview').$response->preview))}}"/>
 <meta property="og:site_name" content="{{$settings->title}}"/>
 <meta property="og:url" content="{{url("photo/$response->id").'/'.str_slug($response->title)}}"/>
-<meta property="og:image" content="{{ asset('public/uploads/preview/') }}/{{$response->preview}}"/>
+<meta property="og:image" content="{{Storage::disk('s3')->url(config('path.preview').$response->preview)}}"/>
 <meta property="og:title" content="{{ $response->title.' - '.trans_choice('misc.photos_plural', 1 ).' #'.$response->id }}"/>
 <meta property="og:description" content="{{ App\Helper::removeLineBreak( e( $response->description ) ) }}"/>
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="{{ asset('public/uploads/preview/') }}/{{$response->preview}}" />
+<meta name="twitter:image" content="{{Storage::disk('s3')->url(config('path.preview').$response->preview)}}" />
 <meta name="twitter:title" content="{{ $response->title.' - '.trans_choice('misc.photos_plural', 1 ).' #'.$response->id }}" />
 <meta name="twitter:description" content="{{ App\Helper::removeLineBreak( e( $response->description ) ) }}"/>
 @endif
@@ -341,7 +341,7 @@
 <div class="row">
     <div class="col-lg-12 col-xs-12 stock-div">
         @if (isset($response))
-            <img src="{{ url('public/uploads/medium',$stockImages{1}->name) }}" class="img-fluid mx-auto stock-img" alt="Responsive image">
+            <img src="{{ Storage::disk('s3')->url(config('path.medium').$stockImages{1}->name) }}" class="img-fluid mx-auto stock-img" alt="Responsive image">
         @endif
         
     </div>

@@ -11,13 +11,14 @@
     }
 @endphp
 <!-- Start Item -->
-@if(!empty($stockImages{0}->name) && App\Helper::getSize('public/uploads/small/'.$stockImages{0}->name) > 0)
+{{-- @if(!empty($stockImages{0}->name) && App\Helper::getSize(Storage::disk('s3')->url(config('path.small').$stockImages{0}->name)) > 0) --}}
+@if(!empty($stockImages{0}->name))
 <a 
     class="item hovercard image-btn" 
     id="{{ $image->id }}" 
     data-img-id="{{ $image->id }}"
-    data-w="{{App\Helper::getWidth('public/uploads/small/'.$stockImages{0}->name)}}"
-    data-h="{{App\Helper::getHeight('public/uploads/small/'.$stockImages{0}->name)}}"
+    data-w="{{App\Helper::getWidth(Storage::disk('s3')->url(config('path.small').$stockImages{0}->name))}}"
+    data-h="{{App\Helper::getHeight(Storage::disk('s3')->url(config('path.small').$stockImages{0}->name))}}"
     
 >
     <!-- hover-content -->
@@ -46,9 +47,9 @@
     
     <img
         @if(!empty($stockImages{0}->name))
-            src="{{ url('public/uploads/small',$stockImages{0}->name) }}"
+            src="{{ Storage::disk('s3')->url(config('path.small').$stockImages{0}->name) }}"
         @else
-            src="{{ url('public/uploads/thumbnail',$imageCollection) }}"
+            src="{{ Storage::disk('s3')->url(config('path.thumbnail').$imageCollection) }}"
         @endif
         class="previewImage"
     />

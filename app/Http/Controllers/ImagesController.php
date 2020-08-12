@@ -22,6 +22,7 @@ use League\ColorExtractor\Palette;
 use Image;
 use App\Models\Purchases;
 use Mail;
+use Illuminate\Support\Facades\Storage;
 
 
 class ImagesController extends Controller {
@@ -105,13 +106,20 @@ class ImagesController extends Controller {
          }
 
         // PATHS
-        $temp            = 'public/temp/';
-      $path_preview    = 'public/uploads/preview/';
-        $path_thumbnail  = 'public/uploads/thumbnail/';
-        $path_small      = 'public/uploads/small/';
-        $path_medium     = 'public/uploads/medium/';
-        $path_large      = 'public/uploads/large/';
-        $watermarkSource = 'public/img/watermark.png';
+        $temp            = config('path.uploads');
+        $path_preview    = config('path.preview');
+        $path_thumbnail  = config('path.thumbnail');
+        $path_small      = config('path.small');
+        $path_medium     = config('path.medium');
+        $path_large      = config('path.large');
+
+        // $temp            = 'public/temp/';
+        // $path_preview    = 'public/uploads/preview/';
+        // $path_thumbnail  = 'public/uploads/thumbnail/';
+        // $path_small      = 'public/uploads/small/';
+        // $path_medium     = 'public/uploads/medium/';
+        // $path_large      = 'public/uploads/large/';
+        // $watermarkSource = 'public/img/watermark.png';
 
          $input = $request->all();
 
@@ -194,7 +202,7 @@ class ImagesController extends Controller {
                 }
 
 
-                Helper::watermark( $temp.$preview, $watermarkSource );
+                // Helper::watermark( $temp.$preview, $watermarkSource );
 
             }// End File
 
@@ -257,7 +265,8 @@ class ImagesController extends Controller {
         //$exif['COMPUTED']['ApertureFNumber'] ----> f/5.6
 
         //=========== Colors
-        $palette = Palette::fromFilename( url('public/temp/').'/'.$preview );
+        // $palette = Palette::fromFilename( url('public/temp/').'/'.$preview );
+        $palette = Palette::fromFilename( config('path.uploads').$preview );
 
         $extractor = new ColorExtractor($palette);
 
@@ -314,11 +323,11 @@ class ImagesController extends Controller {
 	$_title_site = $this->settings->title;
 	$_email_noreply = $this->settings->email_no_reply;
 
-	Mail::send('emails.pending', array('photo_title' => $sql->title, 'username' => $username, 'photo_id' => $sql->id), function($message) use ($username, $user_email, $_title_site, $_email_noreply) {
-		$message->from($_email_noreply, $_title_site);
-		$message->subject(trans('users.photo_pending'));
-		$message->to($user_email, $username);
-	});
+	// Mail::send('emails.pending', array('photo_title' => $sql->title, 'username' => $username, 'photo_id' => $sql->id), function($message) use ($username, $user_email, $_title_site, $_email_noreply) {
+	// 	$message->from($_email_noreply, $_title_site);
+	// 	$message->subject(trans('users.photo_pending'));
+	// 	$message->to($user_email, $username);
+	// });
 
         // ID INSERT
         $imageID = $sql->id;
@@ -356,20 +365,26 @@ class ImagesController extends Controller {
 
         }
 
-            \File::copy($temp.$preview, $path_preview.$preview);
-            \File::delete($temp.$preview);
+            Storage::disk('s3')->put($path_preview.$preview, file_get_contents($temp.$preview), 'public');
+            Storage::disk('s3')->put($path_thumbnail.$thumbnail, file_get_contents($temp.$thumbnail), 'public');
+            Storage::disk('s3')->put($path_small.$small, file_get_contents($temp.$small), 'public');
+            Storage::disk('s3')->put($path_medium.$medium, file_get_contents($temp.$medium), 'public');
+            Storage::disk('s3')->put($path_large.$large, file_get_contents($temp.$large), 'public');
 
-            \File::copy($temp.$thumbnail, $path_thumbnail.$thumbnail);
-            \File::delete($temp.$thumbnail);
+            // \File::copy($temp.$preview, $path_preview.$preview);
+            // \File::delete($temp.$preview);
 
-            \File::copy($temp.$small, $path_small.$small);
-            \File::delete($temp.$small);
+            // \File::copy($temp.$thumbnail, $path_thumbnail.$thumbnail);
+            // \File::delete($temp.$thumbnail);
 
-            \File::copy($temp.$medium, $path_medium.$medium);
-            \File::delete($temp.$medium );
+            // \File::copy($temp.$small, $path_small.$small);
+            // \File::delete($temp.$small);
 
-            \File::copy($temp.$large, $path_large.$large);
-            \File::delete($temp.$large);
+            // \File::copy($temp.$medium, $path_medium.$medium);
+            // \File::delete($temp.$medium );
+
+            // \File::copy($temp.$large, $path_large.$large);
+            // \File::delete($temp.$large);
 
         //\Session::flash('success_message',trans('admin.success_add'));
 

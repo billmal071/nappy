@@ -207,10 +207,10 @@ public static function resizeImageFixed( $image, $width, $height, $imageNew = nu
 		return $image;
 	}
 
-        public static function getSize( $image ) {
-                $size = filesize($image);
-		return $size;
-	}
+	// public static function getSize( $image ) {
+	// 	$size = filesize($image);
+	// 	return $size;
+	// }
         
 	public static function getHeight( $image ) {
 		$size   = getimagesize( $image );
@@ -403,5 +403,44 @@ public static function resizeImageFixed( $image, $width, $height, $imageNew = nu
 	return $amount;
 
  }// END
+// public static function getFileSize($filename)
+public static function getSize($filename)
+{
+	$headers  = get_headers($filename, 1);
+	$fsize    = $headers['Content-Length'];
+	$size    = static::formatBytes($fsize, 1);
+
+	return $size;
+}
+
+public static function resolutionPreview($image)
+{
+	$resolution = explode('x', $image);
+	$lWidth = $resolution[0];
+	$lHeight = $resolution[1];
+
+	if ($lWidth > $lHeight) {
+		if ($lWidth > 1280) : $_scale = 1280; else: $_scale = 900; endif;
+		$previewWidth = 850 / $lWidth;
+	} else {
+		if ($lWidth > 1280) : $_scale = 960; else: $_scale = 800; endif;
+		$previewWidth = 480 / $lWidth;
+	}
+
+	$newWidth = ceil($lWidth * $previewWidth);
+	$newHeight = ceil($lHeight * $previewWidth);
+
+	return $newWidth.'x'.$newHeight;
+}
+
+public static function cleanStr($str)
+{
+	$reservedSymbols = [
+		'!','”','"',"'",'-','+','<','>','@','(',')','~','*',
+		'/','\/','{','}','[',']','#','$','%','&','.','_',':',
+		';','=','?','^','`','|', '//', '\\'
+	];
+	return trim(stripslashes(str_replace($reservedSymbols, '', $str)), ',');
+}
 
 }//<--- End Class

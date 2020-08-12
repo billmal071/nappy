@@ -5,7 +5,7 @@
     $imgHref = url('photo')."/".$image->id;
 @endphp
 <!-- Start Item -->
-<a href="{{$imgHref}}" class="item hovercard image-btn" id="{{ $image->id }}" data-img-id="{{ $image->id }}" data-w="{{App\Helper::getWidth('public/uploads/small/'.$stockImages{0}->name)}}" data-h="{{App\Helper::getHeight('public/uploads/small/'.$stockImages{0}->name)}}" style="cursor: pointer;">
+<a href="{{$imgHref}}" class="item hovercard image-btn" id="{{ $image->id }}" data-img-id="{{ $image->id }}" data-w="{{App\Helper::getWidth(Storage::disk('s3')->url(config('path.small').$stockImages{0}->name))}}" data-h="{{App\Helper::getHeight(Storage::disk('s3')->url(config('path.small').$stockImages{0}->name))}}" style="cursor: pointer;">
     <!-- hover-content -->
     <span class="hover-content">
         <span class="sub-hover">
@@ -18,7 +18,7 @@
         </span><!-- Span Out -->
     </span><!-- hover-content -->
 
-        <img src="{{ url('public/uploads/small',$stockImages{0}->name) }}" class="previewImage" />
+        <img src="{{ Storage::disk('s3')->url(config('path.small').$stockImages{0}->name) }}" class="previewImage" />
 </a><!-- End Item -->
 @endforeach
 
