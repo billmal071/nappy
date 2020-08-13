@@ -9,6 +9,39 @@
     if (empty($stockImages)) {
         $stockImages = \App\Models\Stock::where('images_id', $image->id)->get();
     }
+
+    $colors = explode(",", $image->colors);
+	$color = $colors[0];
+
+	// Width and Height Large
+	$imageLarge = App\Models\Stock::whereImagesId($image->id)->whereType('large')->pluck('resolution')->first();
+
+	if($image->extension == 'png' ) {
+		// $background = 'background: url('.url('public/img/pixel.gif').') repeat center center #e4e4e4;';
+		// $background = 'background: url('Storage::disk('s3')->url(config('path.img').'pixel.gif')') repeat center center #e4e4e4;';
+		$background = 'background: url('.App\Helper::getUrlFromS3('path.img', 'pixel.gif').') repeat center center #e4e4e4;';
+	}  else {
+		$background = 'background-color: #'.$color.'';
+	}
+
+	if($settings->show_watermark == '1') {
+		$thumbnail = Storage::url(config('path.preview').$image->preview);
+
+		$resolution = explode('x', App\Helper::resolutionPreview($imageLarge));
+		$newWidth = $resolution[0];
+		$newHeight = $resolution[1];
+
+	} else {
+		$stockImage = App\Models\Stock::whereImagesId($image->id)->whereType('small')->first();
+
+		$resolution = explode('x', $stockImage->resolution);
+		$newWidth = $resolution[0];
+		$newHeight = $resolution[1];
+
+		// $thumbnail = Storage::disk('s3')->url(config('path.small').$stockImage->name);
+		$thumbnail = App\Helper::getUrlFromS3('path.small', $stockImage->name);
+	}
+
 @endphp
 <!-- Start Item -->
 {{-- @if(!empty($stockImages{0}->name) && App\Helper::getSize(Storage::disk('s3')->url(config('path.small').$stockImages{0}->name)) > 0) --}}
@@ -17,15 +50,18 @@
     class="item hovercard image-btn" 
     id="{{ $image->id }}" 
     data-img-id="{{ $image->id }}"
-    data-w="{{App\Helper::getWidth(Storage::disk('s3')->url(config('path.small').$stockImages{0}->name))}}"
-    data-h="{{App\Helper::getHeight(Storage::disk('s3')->url(config('path.small').$stockImages{0}->name))}}"
-    
+    data-w="{{$newWidth}}"
+    data-h="{{$newHeight}}"
 >
     <!-- hover-content -->
     <span class="hover-content">
         <span class="sub-hover">
             <span class="myicon-right thumbnail-usr">
-                <img src="{{ url('public/avatar/',$image->user()->avatar) }}" alt="User" class="img-circle profile-img">
+                {{-- <img src="{{ url('public/avatar/',$image->user()->avatar) }}" alt="User" class="img-circle profile-img"> --}}
+                <img
+                    src="{{App\Helper::getUrlFromS3('path.avatar', $image->user()->avatar)}}"
+                    alt="User"
+                    class="img-circle profile-img">
                 <em>{{$image->user()->username}}</em>
             </span>
             <span class="myicon-right thumbnail-like">
@@ -47,9 +83,12 @@
     
     <img
         @if(!empty($stockImages{0}->name))
-            src="{{ Storage::disk('s3')->url(config('path.small').$stockImages{0}->name) }}"
+{{-- protected function getUrlFromS3(string $path, string $filename = ''): string --}}
+        {{-- src="{{ Storage::disk('s3')->url(config('path.small').$stockImages{0}->name) }}" --}}
+            src="{{App\Helper::getUrlFromS3('path.small', $stockImages{0}->name)}}"
         @else
-            src="{{ Storage::disk('s3')->url(config('path.thumbnail').$imageCollection) }}"
+        {{-- src="{{ Storage::disk('s3')->url(config('path.thumbnail').$imageCollection) }}" --}}
+            src="{{App\Helper::getUrlFromS3('path.thumbnail', $imageCollection)}}"
         @endif
         class="previewImage"
     />

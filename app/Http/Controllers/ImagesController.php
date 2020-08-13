@@ -91,19 +91,19 @@ class ImagesController extends Controller {
         return view('admin.images')->withData($data);
      }
 
-     /**
-   * Store a newly created resource in storage.
-   *
-   * @return Response
-   */
-     public function create(Request $request) {
+    /**
+      * Store a newly created resource in storage.
+      *
+      * @return Response
+    */
+    public function create(Request $request) {
 
-         if( Auth::guest() ) {
-            return response()->json([
-                    'session_null' => true,
-                    'success' => false,
-                ]);
-         }
+        if( Auth::guest() ) {
+           return response()->json([
+                   'session_null' => true,
+                   'success' => false,
+               ]);
+        }
 
         // PATHS
         $temp            = config('path.uploads');
@@ -123,7 +123,6 @@ class ImagesController extends Controller {
 
          $input = $request->all();
 
-    //dd($input);
          $validator = $this->validator($input);
 
          if ($validator->fails()) {
@@ -136,28 +135,23 @@ class ImagesController extends Controller {
 
         //<--- HASFILE PHOTO
         if( $request->hasFile('photo') )    {
+            $extension       = $request->file('photo')->getClientOriginalExtension();
+            $originalName    = Helper::fileNameOriginal($request->file('photo')->getClientOriginalName());
+            $type_mime_img   = $request->file('photo')->getMimeType();
+            $sizeFile        = $request->file('photo')->getSize();
+            $large           = strtolower( Auth::user()->id.time().str_random(100).'.'.$extension );
+            $medium          = strtolower( Auth::user()->id.time().str_random(100).'.'.$extension );
+            $small           = strtolower( Auth::user()->id.time().str_random(100).'.'.$extension );
+            $preview         = strtolower( str_slug( $request->title, '-').'-'.Auth::user()->id.time().str_random(10).'.'.$extension );
+            $thumbnail       = strtolower( str_slug( $request->title, '-').'-'.Auth::user()->id.time().str_random(10).'.'.$extension );
 
-
-
-        $extension       = $request->file('photo')->getClientOriginalExtension();
-        $originalName    = Helper::fileNameOriginal($request->file('photo')->getClientOriginalName());
-        $type_mime_img   = $request->file('photo')->getMimeType();
-        $sizeFile        = $request->file('photo')->getSize();
-        $large           = strtolower( Auth::user()->id.time().str_random(100).'.'.$extension );
-        $medium          = strtolower( Auth::user()->id.time().str_random(100).'.'.$extension );
-        $small           = strtolower( Auth::user()->id.time().str_random(100).'.'.$extension );
-        $preview         = strtolower( str_slug( $request->title, '-').'-'.Auth::user()->id.time().str_random(10).'.'.$extension );
-        $thumbnail       = strtolower( str_slug( $request->title, '-').'-'.Auth::user()->id.time().str_random(10).'.'.$extension );
-
-        if($request->file('photo')->move($temp, $large) ) {
-
-
+            if($request->file('photo')->move($temp, $large) ) {
 
                 set_time_limit(0);
 
-                 $original = $temp.$large;
-                 $width    = Helper::getWidth( $original );
-                 $height   = Helper::getHeight( $original );
+                $original = $temp.$large;
+                $width    = Helper::getWidth( $original );
+                $height   = Helper::getHeight( $original );
 
                 if ( $width > $height ) {
 
@@ -198,21 +192,16 @@ class ImagesController extends Controller {
                     // Thumbnail
                     $scaleT   = 190 / $width;
                     $uploaded = Helper::resizeImage( $original, $width, $height, $scaleT, $temp.$thumbnail, $request->rotation );
-
                 }
-
-
-                // Helper::watermark( $temp.$preview, $watermarkSource );
-
+            // Helper::watermark( $temp.$preview, $watermarkSource );
             }// End File
-
         } //<----- HASFILE PHOTO
 
-         if( !empty( $request->description ) ) {
-                    $description = Helper::checkTextDb($request->description);
-                } else {
-                    $description = '';
-                }
+        if( !empty( $request->description ) ) {
+            $description = Helper::checkTextDb($request->description);
+        } else {
+            $description = '';
+        }
 
         // Exif Read Data
         $exif_data = @exif_read_data($temp.$large, 0, true);
@@ -233,21 +222,13 @@ class ImagesController extends Controller {
             $ApertureFNumber = $exif_data['COMPUTED']['ApertureFNumber'];
         }
 
-        if( !isset($FocalLength) ) {
-            $FocalLength = '';
-        }
+        if( !isset($FocalLength) ) { $FocalLength = ''; }
 
-        if( !isset($ExposureTime) ) {
-            $ExposureTime = '';
-        }
+        if( !isset($ExposureTime) ) { $ExposureTime = ''; }
 
-        if( !isset($ISO) ) {
-            $ISO = '';
-        }
+        if( !isset($ISO) ) { $ISO = ''; }
 
-        if( !isset($ApertureFNumber) ) {
-            $ApertureFNumber = '';
-        }
+        if( !isset($ApertureFNumber) ) { $ApertureFNumber = ''; }
 
         $exif = $FocalLength.' '.$ApertureFNumber.' '.$ExposureTime. ' '.$ISO;
 
@@ -275,11 +256,10 @@ class ImagesController extends Controller {
 
         // $palette is an iterator on colors sorted by pixel count
         foreach($colors as $color) {
-
             $_color[]  = trim(Color::fromIntToHex($color), '#') ;
         }
 
-           $colors_image = implode( ',', $_color);
+        $colors_image = implode( ',', $_color);
 
         //App\Helper::formatBytes(filesize($file), 1)
         //list($w, $h) = getimagesize($file);
@@ -314,45 +294,55 @@ class ImagesController extends Controller {
 
         $sql->save();
 
-	$recipient = User::join('images', 'users.id', '=', 'images.user_id')
+        $recipient = User::join('images', 'users.id', '=', 'images.user_id')
 			->select('users.email', 'users.username')
 			->where('images.user_id', $sql->user_id)
 			->first();
-	$username = $recipient->username;
-	$user_email = $recipient->email;
-	$_title_site = $this->settings->title;
-	$_email_noreply = $this->settings->email_no_reply;
+        $username = $recipient->username;
+        $user_email = $recipient->email;
+        $_title_site = $this->settings->title;
+        $_email_noreply = $this->settings->email_no_reply;
 
-	// Mail::send('emails.pending', array('photo_title' => $sql->title, 'username' => $username, 'photo_id' => $sql->id), function($message) use ($username, $user_email, $_title_site, $_email_noreply) {
-	// 	$message->from($_email_noreply, $_title_site);
-	// 	$message->subject(trans('users.photo_pending'));
-	// 	$message->to($user_email, $username);
-	// });
+        // Mail::send('emails.pending',
+        //     array('photo_title' => $sql->title, 'username' => $username, 'photo_id' => $sql->id),
+        //     function($message) use ($username, $user_email, $_title_site, $_email_noreply) {
+        //         $message->from($_email_noreply, $_title_site);
+        //         $message->subject(trans('users.photo_pending'));
+        //         $message->to($user_email, $username);
+        // });
 
         // ID INSERT
         $imageID = $sql->id;
 
         // INSERT STOCK IMAGES
+        $lResolution     = list($w, $h) = getimagesize($temp.$large);
+        $lSize           = Helper::formatBytes(filesize($temp.$large), 1);
 
-        $lResolution = list($w, $h) = getimagesize($temp.$large);
-        $lSize     = Helper::formatBytes(filesize($temp.$large), 1);
-
-        $mResolution = list($_w, $_h) = getimagesize($temp.$medium);
-        $mSize     = Helper::formatBytes(filesize($temp.$medium), 1);
+        $mResolution     = list($_w, $_h) = getimagesize($temp.$medium);
+        $mSize           = Helper::formatBytes(filesize($temp.$medium), 1);
 
         $smallResolution = list($__w, $__h) = getimagesize($temp.$small);
         $smallSize       = Helper::formatBytes(filesize($temp.$small), 1);
 
-
-
-    $stockImages = [
-            ['name' => $large, 'type' => 'large', 'resolution' => $w.'x'.$h, 'size' => $lSize ],
-            ['name' => $medium, 'type' => 'medium', 'resolution' => $_w.'x'.$_h, 'size' => $mSize ],
-            ['name' => $small, 'type' => 'small', 'resolution' => $__w.'x'.$__h, 'size' => $smallSize ],
+        $stockImages = [
+            ['name' => $large,
+             'type' => 'large',
+             'resolution' => $w.'x'.$h,
+             'size' => $lSize
+            ],
+            ['name' => $medium,
+             'type' => 'medium',
+             'resolution' => $_w.'x'.$_h,
+             'size' => $mSize
+            ],
+            ['name' => $small,
+             'type' => 'small',
+             'resolution' => $__w.'x'.$__h,
+             'size' => $smallSize
+            ]
         ];
 
         foreach ($stockImages as $key) {
-
             $stock             = new Stock;
             $stock->images_id  = $imageID;
             $stock->name       = $key['name'];
@@ -362,36 +352,44 @@ class ImagesController extends Controller {
             $stock->size       = $key['size'];
             $stock->token      = $token_id;
             $stock->save();
-
         }
 
-            Storage::disk('s3')->put($path_preview.$preview, file_get_contents($temp.$preview), 'public');
-            Storage::disk('s3')->put($path_thumbnail.$thumbnail, file_get_contents($temp.$thumbnail), 'public');
-            Storage::disk('s3')->put($path_small.$small, file_get_contents($temp.$small), 'public');
-            Storage::disk('s3')->put($path_medium.$medium, file_get_contents($temp.$medium), 'public');
-            Storage::disk('s3')->put($path_large.$large, file_get_contents($temp.$large), 'public');
+        Storage::disk('s3')->put($path_preview.$preview, file_get_contents($temp.$preview), 'public');
+        Storage::disk('s3')->temporaryUrl($path_preview.$preview, now()->addMinutes(5));
 
-            // \File::copy($temp.$preview, $path_preview.$preview);
-            // \File::delete($temp.$preview);
+        Storage::disk('s3')->put($path_thumbnail.$thumbnail, file_get_contents($temp.$thumbnail), 'public');
+        Storage::disk('s3')->temporaryUrl($path_thumbnail.$thumbnail, now()->addMinutes(5));
 
-            // \File::copy($temp.$thumbnail, $path_thumbnail.$thumbnail);
-            // \File::delete($temp.$thumbnail);
+        Storage::disk('s3')->put($path_small.$small, file_get_contents($temp.$small), 'public');
+        Storage::disk('s3')->temporaryUrl($path_small.$small, now()->addMinutes(5));
 
-            // \File::copy($temp.$small, $path_small.$small);
-            // \File::delete($temp.$small);
+        Storage::disk('s3')->put($path_medium.$medium, file_get_contents($temp.$medium), 'public');
+        Storage::disk('s3')->temporaryUrl($path_medium.$medium, now()->addMinutes(5));
 
-            // \File::copy($temp.$medium, $path_medium.$medium);
-            // \File::delete($temp.$medium );
+        Storage::disk('s3')->put($path_large.$large, file_get_contents($temp.$large), 'public');
+        Storage::disk('s3')->temporaryUrl($path_large.$large, now()->addMinutes(5));
 
-            // \File::copy($temp.$large, $path_large.$large);
-            // \File::delete($temp.$large);
+        // \File::copy($temp.$preview, $path_preview.$preview);
+        // \File::delete($temp.$preview);
+
+        // \File::copy($temp.$thumbnail, $path_thumbnail.$thumbnail);
+        // \File::delete($temp.$thumbnail);
+
+        // \File::copy($temp.$small, $path_small.$small);
+        // \File::delete($temp.$small);
+
+        // \File::copy($temp.$medium, $path_medium.$medium);
+        // \File::delete($temp.$medium );
+
+        // \File::copy($temp.$large, $path_large.$large);
+        // \File::delete($temp.$large);
 
         //\Session::flash('success_message',trans('admin.success_add'));
 
         return response()->json([
-                    'success' => true,
-                    'target' => url('photo',$imageID),
-                ]);
+            'success' => true,
+            'target' => url('photo',$imageID),
+        ]);
 
     }//<--- End Method
 

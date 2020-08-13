@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input as Input;
+use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\AdminSettings;
 use App\Models\Notifications;
@@ -30,806 +31,815 @@ use Mail;
 
 class AdminController extends Controller {
 
-	public function __construct(AdminSettings $settings) {
-		$this->settings = $settings::first();
-	}
-	// START
-	public function admin() {
+  public function __construct(AdminSettings $settings) {
+    $this->settings = $settings::first();
+  }
+  // START
+  public function admin() {
 
-		return view('admin.dashboard');
+    return view('admin.dashboard');
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	// START
-	public function categories() {
+  // START
+  public function categories() {
 
-		$data      = Categories::orderBy('name')->get();
+    $data      = Categories::orderBy('name')->get();
 
-		return view('admin.categories')->withData($data);
+    return view('admin.categories')->withData($data);
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	public function addCategories() {
+  public function addCategories() {
 
-		return view('admin.add-categories');
+    return view('admin.add-categories');
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	public function storeCategories(Request $request) {
+  public function storeCategories(Request $request) {
 
-		$temp            = 'public/temp/'; // Temp
-	  $path            = 'public/img-category/'; // Path General
+    $temp            = 'public/temp/'; // Temp
+    $path            = 'public/img-category/'; // Path General
 
-		Validator::extend('ascii_only', function($attribute, $value, $parameters){
-    		return !preg_match('/[^x00-x7F\-]/i', $value);
-		});
+    Validator::extend('ascii_only', function($attribute, $value, $parameters){
+        return !preg_match('/[^x00-x7F\-]/i', $value);
+    });
 
-		$rules = array(
+    $rules = array(
             'name'        => 'required',
-	        'slug'        => 'required|ascii_only|unique:categories',
-	        'thumbnail'   => 'mimes:jpg,gif,png,jpe,jpeg|dimensions:min_width=457,min_height=359',
+          'slug'        => 'required|ascii_only|unique:categories',
+          'thumbnail'   => 'mimes:jpg,gif,png,jpe,jpeg|dimensions:min_width=457,min_height=359',
         );
 
-		$this->validate($request, $rules);
+    $this->validate($request, $rules);
 
-		if( $request->hasFile('thumbnail') )	{
+    if( $request->hasFile('thumbnail') )	{
 
-		$extension              = $request->file('thumbnail')->getClientOriginalExtension();
-		$type_mime_shot   = $request->file('thumbnail')->getMimeType();
-		$sizeFile                 = $request->file('thumbnail')->getSize();
-		$thumbnail              = $request->slug.'-'.str_random(32).'.'.$extension;
+    $extension              = $request->file('thumbnail')->getClientOriginalExtension();
+    $type_mime_shot   = $request->file('thumbnail')->getMimeType();
+    $sizeFile                 = $request->file('thumbnail')->getSize();
+    $thumbnail              = $request->slug.'-'.str_random(32).'.'.$extension;
 
-		if( $request->file('thumbnail')->move($temp, $thumbnail) ) {
+    if( $request->file('thumbnail')->move($temp, $thumbnail) ) {
 
-			$image = Image::make($temp.$thumbnail);
+      $image = Image::make($temp.$thumbnail);
 
-			if(  $image->width() == 457 && $image->height() == 359 ) {
+      if(  $image->width() == 457 && $image->height() == 359 ) {
 
-					\File::copy($temp.$thumbnail, $path.$thumbnail);
-					\File::delete($temp.$thumbnail);
+          \File::copy($temp.$thumbnail, $path.$thumbnail);
+          \File::delete($temp.$thumbnail);
 
-			} else {
-				$image->fit(457, 359)->save($temp.$thumbnail);
+      } else {
+        $image->fit(457, 359)->save($temp.$thumbnail);
 
-				\File::copy($temp.$thumbnail, $path.$thumbnail);
-				\File::delete($temp.$thumbnail);
-			}
+        \File::copy($temp.$thumbnail, $path.$thumbnail);
+        \File::delete($temp.$thumbnail);
+      }
 
-			}// End File
-		} // HasFile
+      }// End File
+    } // HasFile
 
-		else {
-			$thumbnail = '';
-		}
+    else {
+      $thumbnail = '';
+    }
 
-		$sql              = New Categories;
-		$sql->name        = trim($request->name);
-		$sql->slug        = strtolower($request->slug);
-		$sql->thumbnail = $thumbnail;
-		$sql->mode        = $request->mode;
-		$sql->save();
+    $sql              = New Categories;
+    $sql->name        = trim($request->name);
+    $sql->slug        = strtolower($request->slug);
+    $sql->thumbnail = $thumbnail;
+    $sql->mode        = $request->mode;
+    $sql->save();
 
-		\Session::flash('success_message', trans('admin.success_add_category'));
+    \Session::flash('success_message', trans('admin.success_add_category'));
 
-    	return redirect('panel/admin/categories');
+      return redirect('panel/admin/categories');
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	public function editCategories($id) {
+  public function editCategories($id) {
 
-		$categories        = Categories::find( $id );
+    $categories        = Categories::find( $id );
 
-		return view('admin.edit-categories')->with('categories',$categories);
+    return view('admin.edit-categories')->with('categories',$categories);
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	public function updateCategories( Request $request ) {
+  public function updateCategories( Request $request ) {
 
 
-		$categories  = Categories::find( $request->id );
-		$temp            = 'public/temp/'; // Temp
-	    $path            = 'public/img-category/'; // Path General
+    $categories  = Categories::find( $request->id );
+    $temp            = 'public/temp/'; // Temp
+      $path            = 'public/img-category/'; // Path General
 
-	    if( !isset($categories) ) {
-			return redirect('panel/admin/categories');
-		}
+      if( !isset($categories) ) {
+      return redirect('panel/admin/categories');
+    }
 
-		Validator::extend('ascii_only', function($attribute, $value, $parameters){
-    		return !preg_match('/[^x00-x7F\-]/i', $value);
-		});
+    Validator::extend('ascii_only', function($attribute, $value, $parameters){
+        return !preg_match('/[^x00-x7F\-]/i', $value);
+    });
 
-		$rules = array(
+    $rules = array(
             'name'        => 'required',
-	        'slug'        => 'required|ascii_only|unique:categories,slug,'.$request->id,
-	        'thumbnail'   => 'mimes:jpg,gif,png,jpe,jpeg|dimensions:min_width=457,min_height=359',
-	     );
+          'slug'        => 'required|ascii_only|unique:categories,slug,'.$request->id,
+          'thumbnail'   => 'mimes:jpg,gif,png,jpe,jpeg|dimensions:min_width=457,min_height=359',
+       );
 
-		$this->validate($request, $rules);
+    $this->validate($request, $rules);
 
-		if( $request->hasFile('thumbnail') )	{
+    if( $request->hasFile('thumbnail') )	{
 
-		$extension              = $request->file('thumbnail')->getClientOriginalExtension();
-		$type_mime_shot   = $request->file('thumbnail')->getMimeType();
-		$sizeFile                 = $request->file('thumbnail')->getSize();
-		$thumbnail              = $request->slug.'-'.str_random(32).'.'.$extension;
+    $extension              = $request->file('thumbnail')->getClientOriginalExtension();
+    $type_mime_shot   = $request->file('thumbnail')->getMimeType();
+    $sizeFile                 = $request->file('thumbnail')->getSize();
+    $thumbnail              = $request->slug.'-'.str_random(32).'.'.$extension;
 
-		if( $request->file('thumbnail')->move($temp, $thumbnail) ) {
+    if( $request->file('thumbnail')->move($temp, $thumbnail) ) {
 
-			$image = Image::make($temp.$thumbnail);
+      $image = Image::make($temp.$thumbnail);
 
-			if(  $image->width() == 457 && $image->height() == 359 ) {
+      if(  $image->width() == 457 && $image->height() == 359 ) {
 
-					\File::copy($temp.$thumbnail, $path.$thumbnail);
-					\File::delete($temp.$thumbnail);
+          \File::copy($temp.$thumbnail, $path.$thumbnail);
+          \File::delete($temp.$thumbnail);
 
-			} else {
-				$image->fit(457, 359)->save($temp.$thumbnail);
+      } else {
+        $image->fit(457, 359)->save($temp.$thumbnail);
 
-				\File::copy($temp.$thumbnail, $path.$thumbnail);
-				\File::delete($temp.$thumbnail);
-			}
+        \File::copy($temp.$thumbnail, $path.$thumbnail);
+        \File::delete($temp.$thumbnail);
+      }
 
-			// Delete Old Image
-			\File::delete($path.$categories->thumbnail);
+      // Delete Old Image
+      \File::delete($path.$categories->thumbnail);
 
-			}// End File
-		} // HasFile
-		else {
-			$thumbnail = $categories->image;
-		}
+      }// End File
+    } // HasFile
+    else {
+      $thumbnail = $categories->image;
+    }
 
-		// UPDATE CATEGORY
-		$categories->name        = $request->name;
-		$categories->slug        = strtolower($request->slug);
-		$categories->thumbnail  = $thumbnail;
-		$categories->mode        = $request->mode;
-		$categories->save();
+    // UPDATE CATEGORY
+    $categories->name        = $request->name;
+    $categories->slug        = strtolower($request->slug);
+    $categories->thumbnail  = $thumbnail;
+    $categories->mode        = $request->mode;
+    $categories->save();
 
-		\Session::flash('success_message', trans('misc.success_update'));
+    \Session::flash('success_message', trans('misc.success_update'));
 
-    	return redirect('panel/admin/categories');
+      return redirect('panel/admin/categories');
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	public function deleteCategories($id){
+  public function deleteCategories($id){
 
-		$categories        = Categories::find( $id );
-		$thumbnail          = 'public/img-category/'.$categories->thumbnail; // Path General
+    $categories = Categories::find( $id );
+    // $thumbnail = 'public/img-category/'.$categories->thumbnail; // Path General
+    $thumbnail = config('path.img-category').$categories->thumbnail;
 
-		if( !isset($categories) || $categories->id == 1 ) {
-			return redirect('panel/admin/categories');
-		} else {
+    if( !isset($categories) || $categories->id == 1 ) {
+        return redirect('panel/admin/categories');
+    } else {
+        $images_category   = Images::where('categories_id',$id)->get();
 
-			$images_category   = Images::where('categories_id',$id)->get();
+        // Delete Category
+        $categories->delete();
 
-			// Delete Category
-			$categories->delete();
+        // Delete Thumbnail
+        // if ( \File::exists($thumbnail) ) {
+        //     \File::delete($thumbnail);
+        // }//<--- IF FILE EXISTS
+        if(Storage::disk('s3')->exists($thumbnail)) {
+            Storage::disk('s3')->delete($thumbnail);
+        }
 
-			// Delete Thumbnail
-			if ( \File::exists($thumbnail) ) {
-				\File::delete($thumbnail);
-			}//<--- IF FILE EXISTS
+        //Update Categories Images
+        if( isset( $images_category ) ) {
+            foreach ($images_category as $key ) {
+                $key->categories_id = 1;
+                $key->save();
+            }
+        }
 
-			//Update Categories Images
-			if( isset( $images_category ) ) {
-				foreach ($images_category as $key ) {
-					$key->categories_id = 1;
-					$key->save();
-				}
-			}
+      return redirect('panel/admin/categories');
+    }
+  }//<--- END METHOD
 
-			return redirect('panel/admin/categories');
-		}
-	}//<--- END METHOD
+  public function settings() {
 
-	public function settings() {
+    return view('admin.settings');
 
-		return view('admin.settings');
+  }//<--- END METHOD
 
-	}//<--- END METHOD
+  public function saveSettings(Request $request) {
 
-	public function saveSettings(Request $request) {
+    Validator::extend('sell_option_validate', function($attribute, $value, $parameters) {
+      // Count images for sale
+      $imagesForSale = Images::where('item_for_sale', 'sale')->where('status', 'active')->count();
 
-		Validator::extend('sell_option_validate', function($attribute, $value, $parameters) {
-			// Count images for sale
-			$imagesForSale = Images::where('item_for_sale', 'sale')->where('status', 'active')->count();
+      if($value == 'off' && $imagesForSale > 0) {
+        return false;
+      }
 
-			if($value == 'off' && $imagesForSale > 0) {
-				return false;
-			}
+      return true;
 
-			return true;
+    });
 
-		});
+    $messages = [
+      'sell_option.sell_option_validate' => trans('misc.sell_option_validate')
+    ];
 
-		$messages = [
-			'sell_option.sell_option_validate' => trans('misc.sell_option_validate')
-		];
-
-		$rules = array(
+    $rules = array(
           'title'            => 'required',
-	        'welcome_text' 	   => 'required',
-	        'welcome_subtitle' => 'required',
-	        'keywords'         => 'required',
-	        'description'      => 'required',
-	        'email_no_reply'   => 'required',
-	        'email_admin'      => 'required',
-					'link_terms'      => 'required|url',
-					'link_privacy'      => 'required|url',
-					'sell_option' => 'sell_option_validate'
+          'welcome_text' 	   => 'required',
+          'welcome_subtitle' => 'required',
+          'keywords'         => 'required',
+          'description'      => 'required',
+          'email_no_reply'   => 'required',
+          'email_admin'      => 'required',
+          'link_terms'      => 'required|url',
+          'link_privacy'      => 'required|url',
+          'sell_option' => 'sell_option_validate'
         );
 
-		$this->validate($request, $rules, $messages);
+    $this->validate($request, $rules, $messages);
 
 
 
-		$sql                      = AdminSettings::first();
-		$sql->title               = $request->title;
-		$sql->welcome_text        = $request->welcome_text;
-		$sql->welcome_subtitle    = $request->welcome_subtitle;
-		$sql->keywords            = $request->keywords;
-		$sql->description         = $request->description;
-		$sql->email_no_reply      = $request->email_no_reply;
-		$sql->email_admin         = $request->email_admin;
-		$sql->link_terms         = $request->link_terms;
-		$sql->link_privacy         = $request->link_privacy;
-		$sql->captcha             = $request->captcha;
-		$sql->registration_active = $request->registration_active;
-		$sql->email_verification  = $request->email_verification;
-		$sql->facebook_login  = $request->facebook_login;
-		$sql->twitter_login = $request->twitter_login;
-		$sql->google_ads_index    = $request->google_ads_index;
-		$sql->sell_option    = $request->sell_option;
-		$sql->save();
+    $sql                      = AdminSettings::first();
+    $sql->title               = $request->title;
+    $sql->welcome_text        = $request->welcome_text;
+    $sql->welcome_subtitle    = $request->welcome_subtitle;
+    $sql->keywords            = $request->keywords;
+    $sql->description         = $request->description;
+    $sql->email_no_reply      = $request->email_no_reply;
+    $sql->email_admin         = $request->email_admin;
+    $sql->link_terms         = $request->link_terms;
+    $sql->link_privacy         = $request->link_privacy;
+    $sql->captcha             = $request->captcha;
+    $sql->registration_active = $request->registration_active;
+    $sql->email_verification  = $request->email_verification;
+    $sql->facebook_login  = $request->facebook_login;
+    $sql->twitter_login = $request->twitter_login;
+    $sql->google_ads_index    = $request->google_ads_index;
+    $sql->sell_option    = $request->sell_option;
+    $sql->save();
 
-		\Session::flash('success_message', trans('admin.success_update'));
+    \Session::flash('success_message', trans('admin.success_update'));
 
-    	return redirect('panel/admin/settings');
+      return redirect('panel/admin/settings');
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	public function settingsLimits() {
+  public function settingsLimits() {
 
-		return view('admin.limits');
+    return view('admin.limits');
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	public function saveSettingsLimits(Request $request) {
+  public function saveSettingsLimits(Request $request) {
 
 
-		$sql                      = AdminSettings::first();
-		$sql->result_request      = $request->result_request;
-		$sql->limit_upload_user   = $request->limit_upload_user;
-		$sql->message_length      = $request->message_length;
-		$sql->comment_length      = $request->comment_length;
-		$sql->file_size_allowed   = $request->file_size_allowed;
-		$sql->auto_approve_images = $request->auto_approve_images;
-		$sql->downloads           = $request->downloads;
-		$sql->tags_limit          = $request->tags_limit;
-		$sql->description_length  = $request->description_length;
-		$sql->min_width_height_image = $request->min_width_height_image;
+    $sql                      = AdminSettings::first();
+    $sql->result_request      = $request->result_request;
+    $sql->limit_upload_user   = $request->limit_upload_user;
+    $sql->message_length      = $request->message_length;
+    $sql->comment_length      = $request->comment_length;
+    $sql->file_size_allowed   = $request->file_size_allowed;
+    $sql->auto_approve_images = $request->auto_approve_images;
+    $sql->downloads           = $request->downloads;
+    $sql->tags_limit          = $request->tags_limit;
+    $sql->description_length  = $request->description_length;
+    $sql->min_width_height_image = $request->min_width_height_image;
 
-		$sql->save();
+    $sql->save();
 
-		\Session::flash('success_message', trans('admin.success_update'));
+    \Session::flash('success_message', trans('admin.success_update'));
 
-    	return redirect('panel/admin/settings/limits');
+      return redirect('panel/admin/settings/limits');
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	public function members_reported() {
+  public function members_reported() {
 
-		$data = UsersReported::orderBy('id','DESC')->get();
+    $data = UsersReported::orderBy('id','DESC')->get();
 
-		return view('admin.members_reported')->withData($data);
+    return view('admin.members_reported')->withData($data);
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	public function delete_members_reported(Request $request) {
+  public function delete_members_reported(Request $request) {
 
-		$report = UsersReported::find($request->id);
+    $report = UsersReported::find($request->id);
 
-		if( isset( $report ) ) {
-			$report->delete();
-		}
+    if( isset( $report ) ) {
+      $report->delete();
+    }
 
-		return redirect('panel/admin/members-reported');
+    return redirect('panel/admin/members-reported');
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	public function images_reported() {
+  public function images_reported() {
 
-		$data = ImagesReported::orderBy('id','DESC')->get();
+    $data = ImagesReported::orderBy('id','DESC')->get();
 
-		//dd($data);
+    //dd($data);
 
-		return view('admin.images_reported')->withData($data);
+    return view('admin.images_reported')->withData($data);
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	public function delete_images_reported(Request $request) {
+  public function delete_images_reported(Request $request) {
 
-		$report = ImagesReported::find($request->id);
+    $report = ImagesReported::find($request->id);
 
-		if( isset( $report ) ) {
-			$report->delete();
-		}
+    if( isset( $report ) ) {
+      $report->delete();
+    }
 
-		return redirect('panel/admin/images-reported');
+    return redirect('panel/admin/images-reported');
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	public function images() {
-
-		$query = Input::get('q');
-		$sort = Input::get('sort');
-		$pagination = 15;
-
-		$data = Images::orderBy('id','desc')->paginate($pagination);
-
-		// Search
-		if( isset( $query ) ) {
-		 	$data = Images::where('title', 'LIKE', '%'.$query.'%')
-			->orWhere('tags', 'LIKE', '%'.$query.'%')
-		 	->orderBy('id','desc')->paginate($pagination);
-		 }
-
-		// Sort
-		if( isset( $sort ) && $sort == 'title' ) {
-			$data = Images::orderBy('title','asc')->paginate($pagination);
-		}
-
-		if( isset( $sort ) && $sort == 'pending' ) {
-			$data = Images::where('status','pending')->paginate($pagination);
-		}
-
-		if( isset( $sort ) && $sort == 'downloads' ) {
-			$data = Images::join('downloads', 'images.id', '=', 'downloads.images_id')
-					->groupBy('downloads.images_id')
-					->orderBy( \DB::raw('COUNT(downloads.images_id)'), 'desc' )
-					->select('images.*')
-					->paginate( $pagination );
-		}
-
-		if( isset( $sort ) && $sort == 'likes' ) {
-			$data = Images::join('likes', function($join){
-				$join->on('likes.images_id', '=', 'images.id')->where('likes.status', '=', '1' );
-			})
-					->groupBy('likes.images_id')
-					->orderBy( \DB::raw('COUNT(likes.images_id)'), 'desc' )
-					->select('images.*')
-					->paginate( $pagination );
-		}
-
-		return view('admin.images', ['data' => $data,'query' => $query, 'sort' => $sort ]);
-	}//<--- End Method
-
-	public function delete_image(Request $request) {
-
-		//<<<<---------------------------------------------
-
-		$image = Images::find($request->id);
-
-		// Delete Notification
-		$notifications = Notifications::where('destination',$request->id)
-			->where('type', '2')
-			->orWhere('destination',$request->id)
-			->where('type', '3')
-			->orWhere('destination',$request->id)
-			->where('type', '6')
-			->get();
-
-		if(  isset( $notifications ) ){
-			foreach($notifications as $notification){
-				$notification->delete();
-			}
-		}
-
-		// Collections Images
-	$collectionsImages = CollectionsImages::where('images_id', '=', $request->id)->get();
-	 if( isset( $collectionsImages ) ){
-			foreach($collectionsImages as $collectionsImage){
-				$collectionsImage->delete();
-			}
-		}
-
-		// Images Reported
-		$imagesReporteds = ImagesReported::where('image_id', '=', $request->id)->get();
-		 if( isset( $imagesReporteds ) ){
-				foreach($imagesReporteds as $imagesReported){
-					$imagesReported->delete();
-				}
-			}
-
-		//<---- ALL RESOLUTIONS IMAGES
-		$stocks = Stock::where('images_id', '=', $request->id)->get();
-
-		foreach($stocks as $stock){
-
-			$stock_path = 'public/uploads/'.$stock->type.'/'.$stock->name;
-
-			// Delete Stock
-			if ( \File::exists($stock_path) ) {
-				\File::delete($stock_path);
-			}//<--- IF FILE EXISTS
-
-			$stock->delete();
-
-		}//<--- End foreach
-
-		$preview_image = 'public/uploads/preview/'.$image->preview;
-		$thumbnail     = 'public/uploads/thumbnail/'.$image->thumbnail;
-
-		// Delete preview
-		if ( \File::exists($preview_image) ) {
-			\File::delete($preview_image);
-		}//<--- IF FILE EXISTS
-
-		// Delete thumbnail
-		if ( \File::exists($thumbnail) ) {
-			\File::delete($thumbnail);
-		}//<--- IF FILE EXISTS
-
-		$image->delete();
-
-		return redirect('panel/admin/images');
-
-	}//<--- End Method
-
-	public function edit_image($id) {
-
-		$data = Images::findOrFail($id);
-
-		return view('admin.edit-image', ['data' => $data ]);
-
-	}//<--- End Method
-
-	public function update_image(Request $request) {
-
-		$sql = Images::find($request->id);
-
-		 $rules = array(
+  public function images() {
+
+    $query = Input::get('q');
+    $sort = Input::get('sort');
+    $pagination = 15;
+
+    $data = Images::orderBy('id','desc')->paginate($pagination);
+
+    // Search
+    if( isset( $query ) ) {
+       $data = Images::where('title', 'LIKE', '%'.$query.'%')
+      ->orWhere('tags', 'LIKE', '%'.$query.'%')
+       ->orderBy('id','desc')->paginate($pagination);
+     }
+
+    // Sort
+    if( isset( $sort ) && $sort == 'title' ) {
+      $data = Images::orderBy('title','asc')->paginate($pagination);
+    }
+
+    if( isset( $sort ) && $sort == 'pending' ) {
+      $data = Images::where('status','pending')->paginate($pagination);
+    }
+
+    if( isset( $sort ) && $sort == 'downloads' ) {
+      $data = Images::join('downloads', 'images.id', '=', 'downloads.images_id')
+          ->groupBy('downloads.images_id')
+          ->orderBy( \DB::raw('COUNT(downloads.images_id)'), 'desc' )
+          ->select('images.*')
+          ->paginate( $pagination );
+    }
+
+    if( isset( $sort ) && $sort == 'likes' ) {
+      $data = Images::join('likes', function($join){
+        $join->on('likes.images_id', '=', 'images.id')->where('likes.status', '=', '1' );
+      })
+          ->groupBy('likes.images_id')
+          ->orderBy( \DB::raw('COUNT(likes.images_id)'), 'desc' )
+          ->select('images.*')
+          ->paginate( $pagination );
+    }
+
+    return view('admin.images', ['data' => $data,'query' => $query, 'sort' => $sort ]);
+  }//<--- End Method
+
+  public function delete_image(Request $request) {
+
+    $image = Images::find($request->id);
+
+    // Delete Notification
+    $notifications = Notifications::where('destination',$request->id)
+        ->where('type', '2')
+        ->orWhere('destination',$request->id)
+        ->where('type', '3')
+        ->orWhere('destination',$request->id)
+        ->where('type', '6')
+        ->get();
+
+    if(  isset( $notifications ) ){
+        foreach($notifications as $notification){
+            $notification->delete();
+        }
+    }
+
+    // Collections Images
+    $collectionsImages = CollectionsImages::where('images_id', '=', $request->id)->get();
+    if( isset( $collectionsImages ) ){
+        foreach($collectionsImages as $collectionsImage){
+            $collectionsImage->delete();
+        }
+    }
+
+    // Images Reported
+    $imagesReporteds = ImagesReported::where('image_id', '=', $request->id)->get();
+    if( isset( $imagesReporteds ) ){
+        foreach($imagesReporteds as $imagesReported){
+            $imagesReported->delete();
+        }
+    }
+
+    //<---- ALL RESOLUTIONS IMAGES
+    $stocks = Stock::where('images_id', '=', $request->id)->get();
+
+    foreach($stocks as $stock){
+
+        // $stock_path = 'public/uploads/'.$stock->type.'/'.$stock->name;
+        $stock_path = config('path.uploads').$stock->type.'/'.$stock->name;
+
+        // Delete Stock
+        // if ( \File::exists($stock_path) ) {
+        // 	\File::delete($stock_path);
+        // }//<--- IF FILE EXISTS
+        if(Storage::disk('s3')->exists($stock_path)) {
+            Storage::disk('s3')->delete($stock_path);
+        }
+
+        $stock->delete();
+    }//<--- End foreach
+
+    // $preview_image = 'public/uploads/preview/'.$image->preview;
+    // $thumbnail     = 'public/uploads/thumbnail/'.$image->thumbnail;
+    $preview_image = config('path.preview').$image->preview;
+    $thumbnail = config('path.thumbnail').$image->thumbnail;
+
+    // Delete preview
+    // if ( \File::exists($preview_image) ) {
+    //   \File::delete($preview_image);
+    // }//<--- IF FILE EXISTS
+    if(Storage::disk('s3')->exists($preview_image)) {
+        Storage::disk('s3')->delete($preview_image);
+    }
+
+    // Delete thumbnail
+    // if ( \File::exists($thumbnail) ) {
+    //   \File::delete($thumbnail);
+    // }//<--- IF FILE EXISTS
+    if(Storage::disk('s3')->exists($thumbnail)) {
+        Storage::disk('s3')->delete($thumbnail);
+    }
+
+    $image->delete();
+
+    return redirect('panel/admin/images');
+
+  }//<--- End Method
+
+  public function edit_image($id) {
+
+    $data = Images::findOrFail($id);
+
+    return view('admin.edit-image', ['data' => $data ]);
+
+  }//<--- End Method
+
+  public function update_image(Request $request) {
+
+    $sql = Images::find($request->id);
+
+     $rules = array(
             'title'       => 'required|min:3|max:50',
             'description' => 'min:2|max:'.$this->settings->description_length.'',
-	        'tags'        => 'required',
+          'tags'        => 'required',
 
         );
-		$_title_site = $this->settings->title;
-		$_email_noreply = $this->settings->email_no_reply;
+    $_title_site = $this->settings->title;
+    $_email_noreply = $this->settings->email_no_reply;
 
-		$user_id = $sql->user_id;
-		$recipient = User::join('images', 'users.id', '=', 'images.user_id')
-				->select('users.email', 'users.username')
-				->where('images.user_id', $user_id)
-				->first();
-		$username = $recipient->username;
-		$user_email = $recipient->email;
-		$photo_title = $sql->title;
-		$photo_id = $sql->id;
+    $user_id = $sql->user_id;
+    $recipient = User::join('images', 'users.id', '=', 'images.user_id')
+        ->select('users.email', 'users.username')
+        ->where('images.user_id', $user_id)
+        ->first();
+    $username = $recipient->username;
+    $user_email = $recipient->email;
+    $photo_title = $sql->title;
+    $photo_id = $sql->id;
 
-		if( $request->featured == 'yes' && $sql->featured == 'no' ) {
-			$featuredDate = \Carbon\Carbon::now();
+    if( $request->featured == 'yes' && $sql->featured == 'no' ) {
+      $featuredDate = \Carbon\Carbon::now();
 
-			Mail::send('emails.featured', array('photo_title' => $photo_title, 'username' => $username, 'photo_id' => $photo_id), function($message) use ($user_email, $username, $_title_site, $_email_noreply) {
-				$message->from($_email_noreply, $_title_site);
-				$message->subject(trans('users.featured_photo'));
-				$message->to($user_email, $username);
-			});
-		} elseif( $request->featured == 'yes' && $sql->featured == 'yes' ) {
-			$featuredDate = $sql->featured_date;
-		} else {
-			$featuredDate = '';
-		}
+      Mail::send('emails.featured', array('photo_title' => $photo_title, 'username' => $username, 'photo_id' => $photo_id), function($message) use ($user_email, $username, $_title_site, $_email_noreply) {
+        $message->from($_email_noreply, $_title_site);
+        $message->subject(trans('users.featured_photo'));
+        $message->to($user_email, $username);
+      });
+    } elseif( $request->featured == 'yes' && $sql->featured == 'yes' ) {
+      $featuredDate = $sql->featured_date;
+    } else {
+      $featuredDate = '';
+    }
 
-		$this->validate($request, $rules);
+    $this->validate($request, $rules);
 
-		$sql->title         = $request->title;
-		$sql->description   = $request->description;
-		$sql->tags          = $request->tags;
-		$sql->categories_id = $request->categories_id;
-		$sql->status        = $request->status;
-		$sql->featured      = $request->featured;
-		$sql->featured_date = $featuredDate;
+    $sql->title         = $request->title;
+    $sql->description   = $request->description;
+    $sql->tags          = $request->tags;
+    $sql->categories_id = $request->categories_id;
+    $sql->status        = $request->status;
+    $sql->featured      = $request->featured;
+    $sql->featured_date = $featuredDate;
 
-		if (isset($request->sponsored)) {
-			$sql->sponsored     = $request->sponsored;
-		}
+    if (isset($request->sponsored)) {
+      $sql->sponsored     = $request->sponsored;
+    }
 
 
-		$sql->save();
-		if($sql->status == 'active') {
-			Mail::send('emails.approve', array('photo_title' => $photo_title, 'username' => $username, 'photo_id' => $photo_id), function($message) use ($user_email, $username, $_title_site, $_email_noreply) {
-				$message->from($_email_noreply, $_title_site);
-				$message->subject(trans('users.photo_approve'));
-				$message->to($user_email, $username);
-			});
-		}
-	    \Session::flash('success_message', trans('admin.success_update'));
+    $sql->save();
+    if($sql->status == 'active') {
+      Mail::send('emails.approve', array('photo_title' => $photo_title, 'username' => $username, 'photo_id' => $photo_id), function($message) use ($user_email, $username, $_title_site, $_email_noreply) {
+        $message->from($_email_noreply, $_title_site);
+        $message->subject(trans('users.photo_approve'));
+        $message->to($user_email, $username);
+      });
+    }
+      \Session::flash('success_message', trans('admin.success_update'));
 
-	    return redirect('panel/admin/images');
-	}//<--- End Method
+      return redirect('panel/admin/images');
+  }//<--- End Method
 
-	public function profiles_social(){
-		return view('admin.profiles-social');
-	}//<--- End Method
+  public function profiles_social(){
+    return view('admin.profiles-social');
+  }//<--- End Method
 
-	public function update_profiles_social(Request $request) {
+  public function update_profiles_social(Request $request) {
 
-		$sql = AdminSettings::find(1);
+    $sql = AdminSettings::find(1);
 
-		$rules = array(
+    $rules = array(
             'twitter'    => 'url',
             'facebook'   => 'url',
             'linkedin'   => 'url',
             'instagram'  => 'url',
         );
 
-		$this->validate($request, $rules);
+    $this->validate($request, $rules);
 
-	    $sql->twitter       = $request->twitter;
-			$sql->facebook      = $request->facebook;
-			$sql->linkedin      = $request->linkedin;
-			$sql->instagram     = $request->instagram;
+      $sql->twitter       = $request->twitter;
+      $sql->facebook      = $request->facebook;
+      $sql->linkedin      = $request->linkedin;
+      $sql->instagram     = $request->instagram;
 
-		$sql->save();
+    $sql->save();
 
-	    \Session::flash('success_message', trans('admin.success_update'));
+      \Session::flash('success_message', trans('admin.success_update'));
 
-	    return redirect('panel/admin/profiles-social');
-	}//<--- End Method
+      return redirect('panel/admin/profiles-social');
+  }//<--- End Method
 
-	public function google() {
+  public function google() {
 
-		return view('admin.google');
+    return view('admin.google');
 
-	}//<--- END METHOD
+  }//<--- END METHOD
 
-	public function update_google(Request $request) {
+  public function update_google(Request $request) {
 
-		$sql = AdminSettings::first();
+    $sql = AdminSettings::first();
 
-			$sql->google_adsense_index   = $request->google_adsense_index;
-	    $sql->google_adsense   = $request->google_adsense;
-		  $sql->google_analytics = $request->google_analytics;
+      $sql->google_adsense_index   = $request->google_adsense_index;
+      $sql->google_adsense   = $request->google_adsense;
+      $sql->google_analytics = $request->google_analytics;
 
-		$sql->save();
+    $sql->save();
 
-	    \Session::flash('success_message', trans('admin.success_update'));
+      \Session::flash('success_message', trans('admin.success_update'));
 
-	    return redirect('panel/admin/google');
-	}//<--- End Method
+      return redirect('panel/admin/google');
+  }//<--- End Method
 
-	public function theme()
-	{
-		return view('admin.theme');
+  public function theme()
+  {
+    return view('admin.theme');
 
-	}//<--- End method
+  }//<--- End method
 
-	public function themeStore(Request $request) {
+  public function themeStore(Request $request) {
 
-		$temp  = 'public/temp/'; // Temp
-	  $path  = 'public/img/'; // Path
+    $temp  = 'public/temp/'; // Temp
+    $path  = 'public/img/'; // Path
 
-		$rules = array(
+    $rules = array(
           'logo'   => 'mimes:png',
-					'favicon'   => 'mimes:png',
-					'index_image_top'   => 'mimes:jpg,jpeg',
-					'index_image_bottom'   => 'mimes:jpg,jpeg',
+          'favicon'   => 'mimes:png',
+          'index_image_top'   => 'mimes:jpg,jpeg',
+          'index_image_bottom'   => 'mimes:jpg,jpeg',
         );
 
-		$this->validate($request, $rules);
+    $this->validate($request, $rules);
 
-		//======= LOGO
-		if( $request->hasFile('logo') )	{
+    //======= LOGO
+    if( $request->hasFile('logo') )	{
 
-		$extension = $request->file('logo')->getClientOriginalExtension();
-		$file      = 'logo.'.$extension;
+    $extension = $request->file('logo')->getClientOriginalExtension();
+    $file      = 'logo.'.$extension;
 
-		if($request->file('logo')->move($temp, $file) ) {
-			\File::copy($temp.$file, $path.$file);
-			\File::delete($temp.$file);
-			}// End File
-		} // HasFile
+    if($request->file('logo')->move($temp, $file) ) {
+      \File::copy($temp.$file, $path.$file);
+      \File::delete($temp.$file);
+      }// End File
+    } // HasFile
 
-		//======== FAVICON
-		if($request->hasFile('favicon') )	{
+    //======== FAVICON
+    if($request->hasFile('favicon') )	{
 
-		$extension  = $request->file('favicon')->getClientOriginalExtension();
-		$file       = 'favicon.'.$extension;
+    $extension  = $request->file('favicon')->getClientOriginalExtension();
+    $file       = 'favicon.'.$extension;
 
-		if( $request->file('favicon')->move($temp, $file) ) {
-			\File::copy($temp.$file, $path.$file);
-			\File::delete($temp.$file);
-			}// End File
-		} // HasFile
+    if( $request->file('favicon')->move($temp, $file) ) {
+      \File::copy($temp.$file, $path.$file);
+      \File::delete($temp.$file);
+      }// End File
+    } // HasFile
 
-		//======== index_image_top
-		if($request->hasFile('index_image_top') )	{
+    //======== index_image_top
+    if($request->hasFile('index_image_top') )	{
 
-		$extension  = $request->file('index_image_top')->getClientOriginalExtension();
-		$file       = 'header_index.'.$extension;
+    $extension  = $request->file('index_image_top')->getClientOriginalExtension();
+    $file       = 'header_index.'.$extension;
 
-		if( $request->file('index_image_top')->move($temp, $file) ) {
-			\File::copy($temp.$file, $path.$file);
-			\File::delete($temp.$file);
-			}// End File
-		} // HasFile
+    if( $request->file('index_image_top')->move($temp, $file) ) {
+      \File::copy($temp.$file, $path.$file);
+      \File::delete($temp.$file);
+      }// End File
+    } // HasFile
 
-		//======== index_image_bottom
-		if($request->hasFile('index_image_bottom') )	{
+    //======== index_image_bottom
+    if($request->hasFile('index_image_bottom') )	{
 
-		$extension  = $request->file('index_image_bottom')->getClientOriginalExtension();
-		$file       = 'cover.'.$extension;
+    $extension  = $request->file('index_image_bottom')->getClientOriginalExtension();
+    $file       = 'cover.'.$extension;
 
-		if( $request->file('index_image_bottom')->move($temp, $file) ) {
-			\File::copy($temp.$file, $path.$file);
-			\File::delete($temp.$file);
-			}// End File
-		} // HasFile
+    if( $request->file('index_image_bottom')->move($temp, $file) ) {
+      \File::copy($temp.$file, $path.$file);
+      \File::delete($temp.$file);
+      }// End File
+    } // HasFile
 
 
-		\Artisan::call('cache:clear');
+    \Artisan::call('cache:clear');
 
-		return redirect('panel/admin/theme')
-			 ->with('success_message', trans('misc.success_update'));
+    return redirect('panel/admin/theme')
+       ->with('success_message', trans('misc.success_update'));
 
-	}//<--- End method
+  }//<--- End method
 
-	public function payments(){
-		return view('admin.payments-settings');
-	}//<--- End Method
+  public function payments(){
+    return view('admin.payments-settings');
+  }//<--- End Method
 
-	public function savePayments(Request $request) {
+  public function savePayments(Request $request) {
 
-		$sql = AdminSettings::first();
+    $sql = AdminSettings::first();
 
-		$rules = array(
+    $rules = array(
             'paypal_account'    => 'email',
         );
 
-		$this->validate($request, $rules);
+    $this->validate($request, $rules);
 
-		switch( $request->currency_code ) {
-			case 'USD':
-				$currency_symbol  = '$';
-				break;
-			case 'EUR':
-				$currency_symbol  = '€';
-				break;
-			case 'GBP':
-				$currency_symbol  = '£';
-				break;
-			case 'AUD':
-				$currency_symbol  = '$';
-				break;
-			case 'JPY':
-				$currency_symbol  = '¥';
-				break;
+    switch( $request->currency_code ) {
+      case 'USD':
+        $currency_symbol  = '$';
+        break;
+      case 'EUR':
+        $currency_symbol  = '€';
+        break;
+      case 'GBP':
+        $currency_symbol  = '£';
+        break;
+      case 'AUD':
+        $currency_symbol  = '$';
+        break;
+      case 'JPY':
+        $currency_symbol  = '¥';
+        break;
 
-			case 'BRL':
-				$currency_symbol  = 'R$';
-				break;
-			case 'MXN':
-				$currency_symbol  = '$';
-				break;
-			case 'SEK':
-				$currency_symbol  = 'Kr';
-				break;
-			case 'CHF':
-				$currency_symbol  = 'CHF';
-				break;
-			case 'SGD':
-				$currency_symbol  = '$';
-				break;
-			case 'DKK':
-				$currency_symbol  = 'Kr';
-				break;
-			case 'RUB':
-				$currency_symbol  = 'руб';
-				break;
-			case 'CAD':
-				$currency_symbol  = '$';
-				break;
-			case 'CZK':
-				$currency_symbol  = 'Kč';
-				break;
-			case 'HKD':
-				$currency_symbol  = 'HK$';
-				break;
-			case 'PLN':
-				$currency_symbol  = 'zł';
-				break;
-			case 'NOK':
-				$currency_symbol  = 'Kr';
-				break;
-		}
+      case 'BRL':
+        $currency_symbol  = 'R$';
+        break;
+      case 'MXN':
+        $currency_symbol  = '$';
+        break;
+      case 'SEK':
+        $currency_symbol  = 'Kr';
+        break;
+      case 'CHF':
+        $currency_symbol  = 'CHF';
+        break;
+      case 'SGD':
+        $currency_symbol  = '$';
+        break;
+      case 'DKK':
+        $currency_symbol  = 'Kr';
+        break;
+      case 'RUB':
+        $currency_symbol  = 'руб';
+        break;
+      case 'CAD':
+        $currency_symbol  = '$';
+        break;
+      case 'CZK':
+        $currency_symbol  = 'Kč';
+        break;
+      case 'HKD':
+        $currency_symbol  = 'HK$';
+        break;
+      case 'PLN':
+        $currency_symbol  = 'zł';
+        break;
+      case 'NOK':
+        $currency_symbol  = 'Kr';
+        break;
+    }
 
-	  $sql->paypal_account     = $request->paypal_account;
-		$sql->currency_symbol  = $currency_symbol;
-		$sql->currency_code    = $request->currency_code;
-		$sql->currency_position    = $request->currency_position;
-		$sql->paypal_sandbox   = $request->paypal_sandbox;
-		$sql->enable_paypal    = $request->enable_paypal;
-		$sql->enable_stripe    = $request->enable_stripe;
-		$sql->min_sale_amount   = $request->min_sale_amount;
-		$sql->max_sale_amount   = $request->max_sale_amount;
-		$sql->min_deposits_amount   = $request->min_deposits_amount;
-		$sql->max_deposits_amount   = $request->max_deposits_amount;
-		$sql->fee_commission        = $request->fee_commission;
-		$sql->stripe_secret_key    = $request->stripe_secret_key;
-		$sql->stripe_public_key    = $request->stripe_public_key;
-		$sql->amount_min_withdrawal    = $request->amount_min_withdrawal;
+    $sql->paypal_account     = $request->paypal_account;
+    $sql->currency_symbol  = $currency_symbol;
+    $sql->currency_code    = $request->currency_code;
+    $sql->currency_position    = $request->currency_position;
+    $sql->paypal_sandbox   = $request->paypal_sandbox;
+    $sql->enable_paypal    = $request->enable_paypal;
+    $sql->enable_stripe    = $request->enable_stripe;
+    $sql->min_sale_amount   = $request->min_sale_amount;
+    $sql->max_sale_amount   = $request->max_sale_amount;
+    $sql->min_deposits_amount   = $request->min_deposits_amount;
+    $sql->max_deposits_amount   = $request->max_deposits_amount;
+    $sql->fee_commission        = $request->fee_commission;
+    $sql->stripe_secret_key    = $request->stripe_secret_key;
+    $sql->stripe_public_key    = $request->stripe_public_key;
+    $sql->amount_min_withdrawal    = $request->amount_min_withdrawal;
 
-		$sql->save();
+    $sql->save();
 
-	    \Session::flash('success_message', trans('admin.success_update'));
+      \Session::flash('success_message', trans('admin.success_update'));
 
-	    return redirect('panel/admin/payments');
-	}//<--- End Method
+      return redirect('panel/admin/payments');
+  }//<--- End Method
 
-	public function purchases(){
+  public function purchases(){
 
-		$data = Purchases::orderBy('id', 'desc')->paginate(30);
+    $data = Purchases::orderBy('id', 'desc')->paginate(30);
 
-		return view('admin.purchases')->withData($data);
-	}//<--- End Method
+    return view('admin.purchases')->withData($data);
+  }//<--- End Method
 
-	public function deposits(){
+  public function deposits(){
 
-		$data = Deposits::orderBy('id', 'desc')->paginate(30);
+    $data = Deposits::orderBy('id', 'desc')->paginate(30);
 
-		return view('admin.deposits')->withData($data);
-	}//<--- End Method
+    return view('admin.deposits')->withData($data);
+  }//<--- End Method
 
-	public function withdrawals(){
+  public function withdrawals(){
 
-		$data = Withdrawals::orderBy('id','DESC')->paginate(50);
-		return view('admin.withdrawals', ['data' => $data, 'settings' => $this->settings]);
-	}//<--- End Method
+    $data = Withdrawals::orderBy('id','DESC')->paginate(50);
+    return view('admin.withdrawals', ['data' => $data, 'settings' => $this->settings]);
+  }//<--- End Method
 
-	public function withdrawalsView($id){
-		$data = Withdrawals::findOrFail($id);
-		return view('admin.withdrawal-view', ['data' => $data, 'settings' => $this->settings]);
-	}//<--- End Method
+  public function withdrawalsView($id){
+    $data = Withdrawals::findOrFail($id);
+    return view('admin.withdrawal-view', ['data' => $data, 'settings' => $this->settings]);
+  }//<--- End Method
 
-	public function withdrawalsPaid(Request $request)
-	{
+  public function withdrawalsPaid(Request $request)
+  {
 
-		$data = Withdrawals::findOrFail($request->id);
+    $data = Withdrawals::findOrFail($request->id);
 
-		// Set Withdrawal as Paid
-		$data->status    = 'paid';
-		$data->date_paid = \Carbon\Carbon::now();
-		$data->save();
+    // Set Withdrawal as Paid
+    $data->status    = 'paid';
+    $data->date_paid = \Carbon\Carbon::now();
+    $data->save();
 
-		$user = $data->user();
+    $user = $data->user();
 
-		// Set Balance a zero
-		$user->balance = 0;
-		$user->save();
+    // Set Balance a zero
+    $user->balance = 0;
+    $user->save();
 
-		//<------ Send Email to User ---------->>>
-		$amount       = Helper::amountFormatDecimal($data->amount).' '.$this->settings->currency_code;
-		$sender       = $this->settings->email_no_reply;
-	  $titleSite    = $this->settings->title;
-		$fullNameUser = $user->name ? $user->name : $user->username;
-		$_emailUser   = $user->email;
+    //<------ Send Email to User ---------->>>
+    $amount       = Helper::amountFormatDecimal($data->amount).' '.$this->settings->currency_code;
+    $sender       = $this->settings->email_no_reply;
+    $titleSite    = $this->settings->title;
+    $fullNameUser = $user->name ? $user->name : $user->username;
+    $_emailUser   = $user->email;
 
-		Mail::send('emails.withdrawal-processed', array(
-					'amount'     => $amount,
-					'fullname'   => $fullNameUser
-		),
-			function($message) use ( $sender, $fullNameUser, $titleSite, $_emailUser)
-				{
-				    $message->from($sender, $titleSite)
-									  ->to($_emailUser, $fullNameUser)
-										->subject( trans('misc.withdrawal_processed').' - '.$titleSite );
-				});
-			//<------ Send Email to User ---------->>>
+    Mail::send('emails.withdrawal-processed', array(
+        'amount'     => $amount,
+        'fullname'   => $fullNameUser
+    ), function($message) use ( $sender, $fullNameUser, $titleSite, $_emailUser)
+    {
+        $message->from($sender, $titleSite)
+                ->to($_emailUser, $fullNameUser)
+                ->subject( trans('misc.withdrawal_processed').' - '.$titleSite );
+    });
+    //<------ Send Email to User ---------->>>
 
-		return redirect('panel/admin/withdrawals');
-
-	}//<--- End Method
-
+    return redirect('panel/admin/withdrawals');
+  }//<--- End Method
 
 }

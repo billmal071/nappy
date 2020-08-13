@@ -169,7 +169,8 @@
         <div class="col-md-3">
 
         	<div class="block-block text-center">
-        		<img src="{{url('public/uploads/thumbnail',$data->thumbnail)}}" class="thumbnail img-responsive">
+        		{{-- <img src="{{url('public/uploads/thumbnail',$data->thumbnail)}}" class="thumbnail img-responsive"> --}}
+        		<img src="{{App\Helper::getUrlFromS3('path.thumbnail', $data->thumbnail)}}" class="thumbnail img-responsive">
         	</div>
 
         	<a href="{{ url('photo',$data->id) }}" target="_blank" class="btn btn-lg btn-success btn-block margin-bottom-10">{{ trans('admin.view') }} <i class="fa fa-external-link-square"></i> </a>

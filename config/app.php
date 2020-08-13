@@ -150,13 +150,11 @@ return [
         /*
          * Package Service Providers...
          */
-	AlbertCht\InvisibleReCaptcha\InvisibleReCaptchaServiceProvider::class,
+        AlbertCht\InvisibleReCaptcha\InvisibleReCaptchaServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
-	Collective\Html\HtmlServiceProvider::class,
-	Laravel\Cashier\CashierServiceProvider::class,
-	Stevebauman\Purify\PurifyServiceProvider::class,
-        KingFlamez\Rave\RaveServiceProvider::class,
-        Chumper\Zipper\ZipperServiceProvider::class,
+        Collective\Html\HtmlServiceProvider::class,
+        Laravel\Cashier\CashierServiceProvider::class,
+        Stevebauman\Purify\PurifyServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -166,8 +164,7 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-        App\Providers\ViewServiceProvider::class
-
+        App\Providers\ViewServiceProvider::class,
     ],
 
     /*
@@ -221,9 +218,6 @@ return [
         'Form' => Collective\Html\FormFacade::class,
         'Html' => Collective\Html\HtmlFacade::class,
         'Purify' => Stevebauman\Purify\Facades\Purify::class,
-        'Rave' => KingFlamez\Rave\Facades\Rave::class,
-        'Zipper' => Chumper\Zipper\Zipper::class
-
     ],
 
 ];

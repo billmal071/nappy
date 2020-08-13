@@ -88,7 +88,8 @@
                   @foreach( $data as $image )
                     <tr>
                       <td>{{ $image->id }}</td>
-                      <td><img src="{{asset('public/uploads/thumbnail').'/'.$image->thumbnail}}" width="50" /></td>
+								{{-- <td><img src="{{asset('public/uploads/thumbnail').'/'.$image->thumbnail}}" width="50" /></td> --}}
+                      <td><img src="{{App\Helper::getUrlFromS3('path.thumbnail', $image->thumbnail)}}" width="50" /></td>
                       <td><a href="{{ url('photo', $image->id) }}" title="{{$image->title}}" target="_blank">{{ str_limit($image->title, 10, '...') }} <i class="fa fa-external-link-square"></i></a></td>
                       <td>{{ $image->user()->username }}</td>
                       <td>{{ $image->item_for_sale == 'sale' ? trans('misc.sale') : trans('misc.free')  }}</td>
