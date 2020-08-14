@@ -303,13 +303,38 @@ class ImagesController extends Controller {
         $_title_site = $this->settings->title;
         $_email_noreply = $this->settings->email_no_reply;
 
-        // Mail::send('emails.pending',
-        //     array('photo_title' => $sql->title, 'username' => $username, 'photo_id' => $sql->id),
-        //     function($message) use ($username, $user_email, $_title_site, $_email_noreply) {
-        //         $message->from($_email_noreply, $_title_site);
-        //         $message->subject(trans('users.photo_pending'));
-        //         $message->to($user_email, $username);
+        // Mail::send('emails.approve',
+        // array('photo_title' => $photo_title,
+        //     'username' => $username,
+        //     'photo_id' => $photo_id),
+        // function($message) use ($user_email, $username, $_title_site, $_email_noreply) {
+        //     $message->from($_email_noreply, $_title_site);
+        //     $message->subject(trans('users.photo_approve'));
+        //     $message->to($user_email, $username);
         // });
+        if($status == 'active') {
+            Mail::send('emails.approve',
+            array('photo_title' => $sql->title,
+                'username' => $username,
+                'photo_id' => $sql->id),
+            function($message) use ($username, $user_email, $_title_site, $_email_noreply) {
+                $message->from($_email_noreply, $_title_site);
+                $message->subject(trans('users.photo_approve'));
+                $message->to($user_email, $username);
+            });
+        }
+
+        if($status == 'pending') {
+            Mail::send('emails.pending',
+            array('photo_title' => $sql->title,
+                'username' => $username,
+                'photo_id' => $sql->id),
+            function($message) use ($username, $user_email, $_title_site, $_email_noreply) {
+                $message->from($_email_noreply, $_title_site);
+                $message->subject(trans('users.photo_pending'));
+                $message->to($user_email, $username);
+            });
+        }
 
         // ID INSERT
         $imageID = $sql->id;
@@ -354,20 +379,20 @@ class ImagesController extends Controller {
             $stock->save();
         }
 
-        Storage::disk('s3')->put($path_preview.$preview, file_get_contents($temp.$preview), 'public');
-        Storage::disk('s3')->temporaryUrl($path_preview.$preview, now()->addMinutes(5));
+        Storage::disk('s3')
+            ->put($path_preview.$preview, file_get_contents($temp.$preview), 'public');
 
-        Storage::disk('s3')->put($path_thumbnail.$thumbnail, file_get_contents($temp.$thumbnail), 'public');
-        Storage::disk('s3')->temporaryUrl($path_thumbnail.$thumbnail, now()->addMinutes(5));
+        Storage::disk('s3')
+            ->put($path_thumbnail.$thumbnail, file_get_contents($temp.$thumbnail), 'public');
 
-        Storage::disk('s3')->put($path_small.$small, file_get_contents($temp.$small), 'public');
-        Storage::disk('s3')->temporaryUrl($path_small.$small, now()->addMinutes(5));
+        Storage::disk('s3')
+            ->put($path_small.$small, file_get_contents($temp.$small), 'public');
 
-        Storage::disk('s3')->put($path_medium.$medium, file_get_contents($temp.$medium), 'public');
-        Storage::disk('s3')->temporaryUrl($path_medium.$medium, now()->addMinutes(5));
+        Storage::disk('s3')
+            ->put($path_medium.$medium, file_get_contents($temp.$medium), 'public');
 
-        Storage::disk('s3')->put($path_large.$large, file_get_contents($temp.$large), 'public');
-        Storage::disk('s3')->temporaryUrl($path_large.$large, now()->addMinutes(5));
+        Storage::disk('s3')
+            ->put($path_large.$large, file_get_contents($temp.$large), 'public');
 
         // \File::copy($temp.$preview, $path_preview.$preview);
         // \File::delete($temp.$preview);

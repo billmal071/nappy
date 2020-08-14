@@ -18,7 +18,6 @@
 
 	if($image->extension == 'png' ) {
 		// $background = 'background: url('.url('public/img/pixel.gif').') repeat center center #e4e4e4;';
-		// $background = 'background: url('Storage::disk('s3')->url(config('path.img').'pixel.gif')') repeat center center #e4e4e4;';
 		$background = 'background: url('.App\Helper::getUrlFromS3('path.img', 'pixel.gif').') repeat center center #e4e4e4;';
 	}  else {
 		$background = 'background-color: #'.$color.'';
@@ -57,7 +56,12 @@
     <span class="hover-content">
         <span class="sub-hover">
             <span class="myicon-right thumbnail-usr">
-                {{-- <img src="{{ url('public/avatar/',$image->user()->avatar) }}" alt="User" class="img-circle profile-img"> --}}
+                {{--
+                <img
+                    src="{{ url('public/avatar/',$image->user()->avatar) }}"
+                    alt="User"
+                    class="img-circle profile-img">
+                --}}
                 <img
                     src="{{App\Helper::getUrlFromS3('path.avatar', $image->user()->avatar)}}"
                     alt="User"
@@ -79,11 +83,10 @@
         <div class="spon-back">
             <span class="spon-txt">SPON</span>
         </div>
-    @endif  
+    @endif
     
     <img
         @if(!empty($stockImages{0}->name))
-{{-- protected function getUrlFromS3(string $path, string $filename = ''): string --}}
         {{-- src="{{ Storage::disk('s3')->url(config('path.small').$stockImages{0}->name) }}" --}}
             src="{{App\Helper::getUrlFromS3('path.small', $stockImages{0}->name)}}"
         @else

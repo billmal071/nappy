@@ -534,6 +534,18 @@ class AdminController extends Controller {
       $featuredDate = '';
     }
 
+    if($request->status == 'active' && $sql->status == 'pending') {
+      Mail::send('emails.approve',
+      array('photo_title' => $photo_title,
+          'username' => $username,
+          'photo_id' => $photo_id),
+      function($message) use ($user_email, $username, $_title_site, $_email_noreply) {
+          $message->from($_email_noreply, $_title_site);
+          $message->subject(trans('users.photo_approve'));
+          $message->to($user_email, $username);
+      });
+    }
+
     $this->validate($request, $rules);
 
     $sql->title         = $request->title;
@@ -548,16 +560,8 @@ class AdminController extends Controller {
       $sql->sponsored     = $request->sponsored;
     }
 
-
     $sql->save();
-    if($sql->status == 'active') {
-      Mail::send('emails.approve', array('photo_title' => $photo_title, 'username' => $username, 'photo_id' => $photo_id), function($message) use ($user_email, $username, $_title_site, $_email_noreply) {
-        $message->from($_email_noreply, $_title_site);
-        $message->subject(trans('users.photo_approve'));
-        $message->to($user_email, $username);
-      });
-    }
-      \Session::flash('success_message', trans('admin.success_update'));
+    \Session::flash('success_message', trans('admin.success_update'));
 
       return redirect('panel/admin/images');
   }//<--- End Method

@@ -7,7 +7,7 @@
 @include('includes.nav-pills')
 
 <div class="container-fluid margin-bottom-40 padding-top-40">
-	<div class="row">
+  <div class="row">
 
         <!-- col-md-8 -->
        <div class="col-md-12">
@@ -16,59 +16,52 @@
                 @include('includes.gallery')
             </div>
 
-		</div><!-- col-md-12-->
+    </div><!-- col-md-12-->
 
-	</div><!-- row -->
+  </div><!-- row -->
 </div><!-- container -->
 @endsection
 
 @section('javascript')
 
-    <script src="{{ asset('public/js/loadingoverlay.js') }}"></script>
-    <script src="{{ asset('public/js/custom/gallery.js') }}"></script>
+<script src="{{ asset('public/js/loadingoverlay.js') }}"></script>
+<script src="{{ asset('public/js/custom/gallery.js') }}"></script>
 
 <script type="text/javascript">
+    $('#imagesFlex').flexImages({ rowHeight: 320 });
 
- $('#imagesFlex').flexImages({ rowHeight: 320 });
+    //<<---- PAGINATION AJAX
+    $(document).on('click','.pagination a', function(e) {
 
-//<<---- PAGINATION AJAX
-        $(document).on('click','.pagination a', function(e){
-			e.preventDefault();
-			var page = $(this).attr('href').split('page=')[1];
-			$.ajax({
-				headers: {
-        	'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-    		},
-					url: '{{ URL::to("/") }}/ajax/featured?page=' + page
+        e.preventDefault();
+        var page = $(this).attr('href').split('page=')[1];
 
+        $.ajax({
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            url: '{{ URL::to("/") }}/ajax/featured?page=' + page
+        }).done(function(data){
 
-			}).done(function(data){
-				if( data ) {
+            if( data ) {
+                scrollElement('#imagesFlex');
+                $('.dataResult').html(data);
 
-					scrollElement('#imagesFlex');
+                $('.hovercard').hover(function() {
+                    $(this).find('.hover-content').fadeIn();
+                }, function() {
+                    $(this).find('.hover-content').fadeOut();
+                });
 
-					$('.dataResult').html(data);
+                $('#imagesFlex').flexImages({ rowHeight: 320 });
+                jQuery(".timeAgo").timeago();
 
-					$('.hovercard').hover(
-		               function () {
-		                  $(this).find('.hover-content').fadeIn();
-		               },
-		               function () {
-		                  $(this).find('.hover-content').fadeOut();
-		               }
-		            );
+                $('[data-toggle="tooltip"]').tooltip();
+            } else {
+                sweetAlert("{{trans('misc.error_oops')}}", "{{trans('misc.error')}}", "error");
+            }
+        //<**** - Tooltip
+        });
 
-					$('#imagesFlex').flexImages({ rowHeight: 320 });
-					jQuery(".timeAgo").timeago();
-
-					$('[data-toggle="tooltip"]').tooltip();
-				} else {
-					sweetAlert("{{trans('misc.error_oops')}}", "{{trans('misc.error')}}", "error");
-				}
-				//<**** - Tooltip
-			});
-
-		});//<<---- PAGINATION AJAX
+    });//<<---- PAGINATION AJAX
 </script>
 
 
