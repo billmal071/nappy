@@ -42,10 +42,8 @@
     class="item hovercard"
     data-w="{{ $newWidth }}"
     data-h="{{ $newHeight }}"
-    {{-- data-w="{{App\Helper::getWidth('public/uploads/small/'.$stockImages{0}->name)}}" --}}
-    {{-- data-h="{{App\Helper::getHeight('public/uploads/small/'.$stockImages{0}->name)}}"> --}}
-  <!-- hover-content -->
-  <span class="hover-content">
+>
+    <span class="hover-content">
         <h5 class="text-overflow title-hover-content" title="{{$image->title}}">
             @if( $image->featured == 'yes' )
                 <i class="icon icon-Medal myicon-right" title="{{trans('misc.featured')}}"></i>
@@ -56,7 +54,10 @@
         <h5 class="text-overflow author-label mg-bottom-xs" title="{{$image->user()->username}}">
             <img
                 {{-- src="{{ url('public/avatar/',$image->user()->avatar) }}" --}}
-                src="{{ Storage::disk('s3')->url(config('path.avatar').$image->user()->avatar) }}"
+                @if($image->user()->avatar == 'default.jpg')
+                    src={{ url('public/avatar', 'default.jpg') }}
+                @endif
+                src="{{ App\Helper::getUrlFromS3('path.avatar', $image->user()->avatar) }}"
                 alt="User"
                 class="img-circle"
                 style="width: 20px; height: 20px; display: inline-block; margin-right: 5px;">
@@ -86,9 +87,8 @@
     </span><!-- hover-content -->
 
     {{-- <img src="{{ url('public/uploads/small/',$stockImages{0}->name) }}" /> --}}
-    <img src="{{ Storage::url(config('path.small').$stockImages{0}->name) }}" />
+    <img src="{{ App\Helper::getUrlFromS3('path.small', $stockImages{0}->name) }}" />
 </a><!-- End Item -->
-
 @endforeach
 
 @if( $images->count() != 0  )

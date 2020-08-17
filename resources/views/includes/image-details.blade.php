@@ -174,7 +174,15 @@
             <div class="row">
                 <div class="col-lg-5 col-md-5 col-sm-7 col-xs-8">
                     <span>
-                        <img src="{{ url('public/avatar/',$response->user()->avatar) }}" alt="User" class="img-circle profile-btn profile-img" data-user="{{$response->user()->username}}">
+                        {{-- <img src="{{ url('public/avatar/',$response->user()->avatar) }}" alt="User" class="img-circle profile-btn profile-img" data-user="{{$response->user()->username}}"> --}}
+                        <img
+                            @if($response->user()->avatar == 'default.jpg')
+                                src={{ url('public/avatar', 'default.jpg') }}
+                            @endif
+                            src="{{ App\Helper::getUrlFromS3('path.avatar', $response->user()->avatar) }}"
+                            alt="User"
+                            class="img-circle profile-btn profile-img"
+                            data-user="{{$response->user()->username}}">
                         <em class="profile-btn" data-user="{{$response->user()->username}}" >{{'@'.$response->user()->username}}</em>
                     </span>
                 </div>
