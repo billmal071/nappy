@@ -11,35 +11,40 @@
     }
 
     $colors = explode(",", $image->colors);
-	$color = $colors[0];
+    $color = $colors[0];
 
-	// Width and Height Large
-	$imageLarge = App\Models\Stock::whereImagesId($image->id)->whereType('large')->pluck('resolution')->first();
+    // Width and Height Large
+    $imageLarge = App\Models\Stock::whereImagesId($image->id)
+                    ->whereType('large')
+                    ->pluck('resolution')
+                    ->first();
 
-	if($image->extension == 'png' ) {
-		// $background = 'background: url('.url('public/img/pixel.gif').') repeat center center #e4e4e4;';
-		$background = 'background: url('.App\Helper::getUrlFromS3('path.img', 'pixel.gif').') repeat center center #e4e4e4;';
-	}  else {
-		$background = 'background-color: #'.$color.'';
-	}
+    if($image->extension == 'png' ) {
+        // $background = 'background: url('.url('public/img/pixel.gif').') repeat center center #e4e4e4;';
+        $background = 'background: url('.App\Helper::getUrlFromS3('path.img', 'pixel.gif').') repeat center center #e4e4e4;';
+    }  else {
+        $background = 'background-color: #'.$color.'';
+    }
 
-	if($settings->show_watermark == '1') {
-		$thumbnail = Storage::url(config('path.preview').$image->preview);
+    if($settings->show_watermark == '1') {
+        $thumbnail = Storage::url(config('path.preview').$image->preview);
 
-		$resolution = explode('x', App\Helper::resolutionPreview($imageLarge));
-		$newWidth = $resolution[0];
-		$newHeight = $resolution[1];
+        $resolution = explode('x', App\Helper::resolutionPreview($imageLarge));
+        $newWidth = $resolution[0];
+        $newHeight = $resolution[1];
 
-	} else {
-		$stockImage = App\Models\Stock::whereImagesId($image->id)->whereType('small')->first();
+    } else {
+        $stockImage = App\Models\Stock::whereImagesId($image->id)
+                        ->whereType('small')
+                        ->first();
 
-		$resolution = explode('x', $stockImage->resolution);
-		$newWidth = $resolution[0];
-		$newHeight = $resolution[1];
+        $resolution = explode('x', $stockImage->resolution);
+        $newWidth = $resolution[0];
+        $newHeight = $resolution[1];
 
-		// $thumbnail = Storage::disk('s3')->url(config('path.small').$stockImage->name);
-		$thumbnail = App\Helper::getUrlFromS3('path.small', $stockImage->name);
-	}
+        // $thumbnail = Storage::disk('s3')->url(config('path.small').$stockImage->name);
+        $thumbnail = App\Helper::getUrlFromS3('path.small', $stockImage->name);
+    }
 
 @endphp
 <!-- Start Item -->

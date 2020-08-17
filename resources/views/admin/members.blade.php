@@ -84,7 +84,17 @@
                   @foreach( $data as $user )
                     <tr>
                       <td>{{ $user->id }}</td>
-                      <td><img src="{{asset('public/avatar').'/'.$user->avatar}}" width="20" height="20" class="img-circle" /> {{ $user->username }}</td>
+                      <td>
+						<img
+							@if($user->avatar == 'default.jpg')
+								src="{{asset('public/avatar').'/'.$user->avatar}}"
+							@endif
+							src="{{ App\Helper::getUrlFromS3('path.avatar', $user->avatar) }}"
+							width="20"
+							height="20"
+							class="img-circle" />
+							{{ $user->username }}
+					  </td>
                       <td>{{ $user->images()->count() }}</td>
                       <td>{{\App\Helper::amountFormatDecimal($user->balance)}}</td>
                       <td>{{\App\Helper::amountFormatDecimal($user->funds)}}</td>

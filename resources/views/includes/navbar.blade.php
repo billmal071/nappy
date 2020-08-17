@@ -6,7 +6,12 @@ if( Auth::check() ) {
 }
 ?>
 
-<div class="btn-block text-center class-montserrat showBanner padding-top-10 padding-bottom-10" style="display:none;">{{trans('misc.cookies_text')}} <button class="btn btn-sm btn-success" id="close-banner">{{trans('misc.agree')}}</button></div>
+<div class="btn-block text-center class-montserrat showBanner padding-top-10 padding-bottom-10" style="display:none;">
+    {{trans('misc.cookies_text')}}
+    <button class="btn btn-sm btn-success" id="close-banner">
+        {{trans('misc.agree')}}
+    </button>
+</div>
 
 <div class="navbar navbar-default navBar">
       <div class="container">
@@ -111,7 +116,13 @@ if( Auth::check() ) {
 
                 <li class="dropdown">
                       <a href="javascript:void(0);" data-toggle="dropdown" class="userAvatar myprofile dropdown-toggle font-default text-capitalize">
-                            <img src="{{ asset('public/avatar').'/'.$userAuth->avatar }}" alt="User" class="img-circle avatarUser" width="21" height="21">
+                            {{-- <img src="{{ asset('public/avatar').'/'.$userAuth->avatar }}" alt="User" class="img-circle avatarUser" width="21" height="21"> --}}
+                            <img
+                                src="{{App\Helper::getUrlFromS3('path.avatar', $userAuth->avatar)}}"
+                                alt="User"
+                                class="img-circle avatarUser"
+                                width="21"
+                                height="21">
                             <span class="title-dropdown">{{ trans('users.my_profile') }}</span>
                             <i class="ion-chevron-down margin-lft5"></i>
                         </a>
@@ -120,13 +131,15 @@ if( Auth::check() ) {
                       <ul class="dropdown-menu dd-close arrow-up nav-session" role="menu" aria-labelledby="dropdownMenu4">
 
 
-                     @if( $userAuth->role == 'admin' )
+                    @if( $userAuth->role == 'admin' )
                         <li>
                             <a href="{{ url('panel/admin') }}" class="text-overflow">
-                                <i class="icon icon-Speedometter myicon-right"></i> {{ trans('admin.admin') }}</a>
-                                </li>
-                                <li role="separator" class="divider"></li>
-                        @endif
+                                <i class="icon icon-Speedometter myicon-right"></i>
+                                {{ trans('admin.admin') }}
+                            </a>
+                        </li>
+                        <li role="separator" class="divider"></li>
+                    @endif
 
                                     @if($settings->sell_option == 'on')
                                     <li>

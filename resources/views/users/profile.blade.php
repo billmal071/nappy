@@ -10,7 +10,8 @@
             if( $user->cover == '' ) {
                 $cover = 'background: #232a29;';
             }   else {
-                $cover = "background: url('public/cover/$user->cover') no-repeat center center #232a29; background-size: cover;";
+                // $cover = "background: url('public/cover/$user->cover') no-repeat center center #232a29; background-size: cover;";
+                $cover = 'background: url('.App\Helper::getUrlFromS3('path.cover', $user->cover).') no-repeat center center #232a29; background-size: cover;';
             }
 
             $purchases = App\Models\Purchases::leftJoin('images', function($join) {
@@ -76,7 +77,12 @@ if( Auth::check() ) {
     <div class="center-block text-center profile-user-over">
 
         <a href="{{ url($user->username) }}">
-            <img src="{{ asset('public/avatar').'/'.$user->avatar }}" width="150" height="150" class="img-circle border-avatar-profile avatarUser" />
+            {{-- <img src="{{ asset('public/avatar').'/'.$user->avatar }}" width="150" height="150" class="img-circle border-avatar-profile avatarUser" /> --}}
+            <img
+                src="{{ App\Helper::getUrlFromS3('path.avatar', $user->avatar) }}"
+                width="150"
+                height="150"
+                class="img-circle border-avatar-profile avatarUser" />
         </a>
 
         <h1 class="title-item none-overflow font-default">

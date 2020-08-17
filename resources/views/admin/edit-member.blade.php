@@ -183,7 +183,12 @@
         <div class="col-md-3">
 
         	<div class="block-block text-center">
-        		<img src="{{asset('public/avatar').'/'.$data->avatar}}" class="thumbnail img-responsive">
+            <img
+              @if($data->avatar == 'default.jpg')
+                src="{{asset('public/avatar').'/'.$data->avatar}}"
+              @endif
+              src="{{ App\Helper::getUrlFromS3('path.avatar', $data->avatar)}}"
+              class="thumbnail img-responsive">
         	</div>
 
         	<a href="{{ url($data->username) }}" target="_blank" class="btn btn-lg btn-success btn-block margin-bottom-10">{{ trans('admin.view') }} <i class="fa fa-external-link-square"></i> </a>

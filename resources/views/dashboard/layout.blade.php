@@ -144,7 +144,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <!-- Sidebar user panel (optional) -->
           <div class="user-panel">
             <div class="pull-left image">
-              <img src="{{ asset('public/avatar').'/'.Auth::user()->avatar }}" class="img-circle" alt="User Image" />
+              {{-- <img src="{{ asset('public/avatar').'/'.Auth::user()->avatar }}" class="img-circle" alt="User Image" /> --}}
+              <img
+                src="{{App\Helper::getUrlFromS3('path.avatar', Auth::user()->avatar)}}"
+                class="img-circle"
+                alt="User Image" />
             </div>
             <div class="pull-left info">
               <p class="text-overflow">{{ Auth::user()->username }}</p>

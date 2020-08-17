@@ -160,12 +160,26 @@
 
 												<li class="item">
 		                      <div class="product-img">
-		                        <img src="{{ asset('public/avatar').'/'.$user->avatar }}" style="height: auto !important;" />
+		                        {{-- <img src="{{ asset('public/avatar').'/'.$user->avatar }}" style="height: auto !important;" /> --}}
+                            <img
+                              @if ($user->avatar == 'default.jpg')
+                                src="{{ asset('public/avatar').'/'.$user->avatar }}"
+                              @endif
+                              src="{{ App\Helper::getUrlFromS3('path.avatar', $user->avatar) }}"
+                              style="height: auto !important;" />
 		                      </div>
 		                      <div class="product-info">
-		                        <a href="{{ url($user->username) }}" target="_blank" class="product-title">@if($user->name !='' ) {{ $user->name }} @else {{ $user->username }} @endif
-		                        	<span class="label label-{{ $user_color_status }} pull-right">{{ $user_txt_status }}</span>
-		                        	</a>
+                            <a
+                              href="{{ url($user->username) }}"
+                              target="_blank"
+                              class="product-title">
+                              @if($user->name !='' ) {{ $user->name }}
+                              @else {{ $user->username }}
+                              @endif
+                              <span class="label label-{{ $user_color_status }} pull-right">
+                                {{ $user_txt_status }}
+                              </span>
+                            </a>
 		                        <span class="product-description">
 		                          {{ '@'.$user->username }} / {{ App\Helper::formatDate($user->date) }}
 		                        </span>
@@ -215,7 +229,10 @@
                        ?>
                     <li class="item">
                       <div class="product-img">
-                        <img src="{{ asset('public/uploads/thumbnail/').'/'.$image->thumbnail }}" style="height: auto !important;" />
+                        {{-- <img src="{{ asset('public/uploads/thumbnail/').'/'.$image->thumbnail }}" style="height: auto !important;" /> --}}
+                        <img
+                          src="{{ App\Helper::getUrlFromS3('path.thumbnail', $image->thumbnail) }}"
+                          style="height: auto !important;" />
                       </div>
                       <div class="product-info">
                         <a href="{{ url('photo') }}/{{$image->id}}" target="_blank" class="product-title">{{ $image->title }}

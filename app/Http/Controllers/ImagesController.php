@@ -25,14 +25,16 @@ use Mail;
 use Illuminate\Support\Facades\Storage;
 
 
-class ImagesController extends Controller {
+class ImagesController extends Controller
+{
 
-     public function __construct( AdminSettings $settings, Request $request) {
+    public function __construct( AdminSettings $settings, Request $request)
+    {
         $this->settings = $settings::first();
         $this->request = $request;
     }
 
-     protected function validator(array $data, $id = null) {
+    protected function validator(array $data, $id = null) {
 
         Validator::extend('ascii_only', function($attribute, $value, $parameters){
             return !preg_match('/[^x00-x7F\-]/i', $value);
@@ -49,22 +51,25 @@ class ImagesController extends Controller {
         }
 
         $messages = array (
-        'photo.required' => trans('misc.please_select_image'),
-    "photo.max"   => trans('misc.max_size').' '.Helper::formatBytes( $sizeAllowed, 1 ),
-        "price.required_if" => trans('misc.price_required'),
-        'price.min' => trans('misc.price_minimum_sale'.$currencyPosition, ['symbol' => $this->settings->currency_symbol, 'code' => $this->settings->currency_code]),
-        'price.max' => trans('misc.price_maximum_sale'.$currencyPosition, ['symbol' => $this->settings->currency_symbol, 'code' => $this->settings->currency_code]),
-
-    );
+            'photo.required' => trans('misc.please_select_image'),
+            "photo.max"   => trans('misc.max_size').' '.Helper::formatBytes( $sizeAllowed, 1 ),
+            "price.required_if" => trans('misc.price_required'),
+            'price.min' => trans('misc.price_minimum_sale'.$currencyPosition, [
+                'symbol' => $this->settings->currency_symbol,
+                'code' => $this->settings->currency_code ]),
+            'price.max' => trans('misc.price_maximum_sale'.$currencyPosition, [
+                'symbol' => $this->settings->currency_symbol,
+                'code' => $this->settings->currency_code]),
+        );
 
         // Create Rules
         if( $id == null ) {
             return Validator::make($data, [
-             'photo'       => 'required|mimes:jpg,gif,png,jpe,jpeg|dimensions:min_width='.$dimensions[0].',min_height='.$dimensions[1].'|max:'.$this->settings->file_size_allowed.'',
+            'photo'       => 'required|mimes:jpg,gif,png,jpe,jpeg|dimensions:min_width='.$dimensions[0].',min_height='.$dimensions[1].'|max:'.$this->settings->file_size_allowed.'',
             'title'       => 'required|min:3|max:50',
             'description' => 'min:2|max:'.$this->settings->description_length.'',
             'tags'        => 'required',
-                    'price' => 'required_if:item_for_sale,==,sale|integer|min:'.$this->settings->min_sale_amount.'|max:'.$this->settings->max_sale_amount.''
+            'price' => 'required_if:item_for_sale,==,sale|integer|min:'.$this->settings->min_sale_amount.'|max:'.$this->settings->max_sale_amount.''
         ], $messages);
 
         // Update Rules
@@ -73,7 +78,7 @@ class ImagesController extends Controller {
                 'title'       => 'required|min:3|max:50',
                 'description' => 'min:2|max:'.$this->settings->description_length.'',
                 'tags'        => 'required',
-                        'price' => 'required_if:item_for_sale,==,sale|integer|min:'.$this->settings->min_sale_amount.'|max:'.$this->settings->max_sale_amount.''
+                'price' => 'required_if:item_for_sale,==,sale|integer|min:'.$this->settings->min_sale_amount.'|max:'.$this->settings->max_sale_amount.''
             ], $messages);
         }
 
@@ -84,7 +89,8 @@ class ImagesController extends Controller {
    *
    * @return Response
    */
-     public function index() {
+     public function index()
+     {
 
         $data = Images::all();
 
@@ -96,7 +102,8 @@ class ImagesController extends Controller {
       *
       * @return Response
     */
-    public function create(Request $request) {
+    public function create(Request $request)
+    {
 
         if( Auth::guest() ) {
            return response()->json([
@@ -381,18 +388,23 @@ class ImagesController extends Controller {
 
         Storage::disk('s3')
             ->put($path_preview.$preview, file_get_contents($temp.$preview), 'public');
+        \File::delete($temp.$preview);
 
         Storage::disk('s3')
             ->put($path_thumbnail.$thumbnail, file_get_contents($temp.$thumbnail), 'public');
+        \File::delete($temp.$thumbnail);
 
         Storage::disk('s3')
             ->put($path_small.$small, file_get_contents($temp.$small), 'public');
+        \File::delete($temp.$small);
 
         Storage::disk('s3')
             ->put($path_medium.$medium, file_get_contents($temp.$medium), 'public');
+        \File::delete($temp.$medium );
 
         Storage::disk('s3')
             ->put($path_large.$large, file_get_contents($temp.$large), 'public');
+        \File::delete($temp.$large);
 
         // \File::copy($temp.$preview, $path_preview.$preview);
         // \File::delete($temp.$preview);

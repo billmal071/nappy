@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Traits;
 
 use Illuminate\Support\Facades\Input as Input;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests;
 use App\Models\AdminSettings;
 use App\Models\User;
@@ -22,154 +23,175 @@ use App\Models\CollectionsImages;
 use App\Models\Pages;
 use Illuminate\Http\Request;
 
-trait userTraits {
+trait userTraits
+{
 
-    public function deleteUser($id) {
+    public function deleteUser($id)
+    {
+        $user = User::findOrFail($id);
 
-		$user = User::findOrFail($id);
+        // Collections
+        $collections = Collections::where('user_id', '=', $id)->get();
 
-		// Collections
-	$collections = Collections::where('user_id', '=', $id)->get();
+        if( isset( $collections ) ){
+            foreach($collections as $collection){
+                // Collections
+                $collectionsImages = CollectionsImages::where('images_id', '=', $collection->id)->get();
+                if( isset( $collectionsImages ) ){
+                    foreach($collectionsImages as $collectionsImage){
+                        $collectionsImage->delete();
+                    }
+                }
+                $collection->delete();
+            }
+        }
 
-	if( isset( $collections ) ){
-		foreach($collections as $collection){
+        // Comments Delete
+        $comments = Comments::where('user_id', '=', $id)->get();
 
-			// Collections
-		$collectionsImages = CollectionsImages::where('images_id', '=', $collection->id)->get();
-		 if( isset( $collectionsImages ) ){
-				foreach($collectionsImages as $collectionsImage){
-					$collectionsImage->delete();
-				}
-			}
-   $collection->delete();
-		}
-	}
+        if( isset( $comments ) ){
+            foreach($comments as $comment){
+                $comment->delete();
+            }
+        }
 
-	// Comments Delete
-	$comments = Comments::where('user_id', '=', $id)->get();
+        // Replies
+        $replies = Replies::where('user_id', '=', $id)->get();
 
-	if( isset( $comments ) ){
-		foreach($comments as $comment){
-			$comment->delete();
-		}
-	}
+        if( isset( $replies ) ){
+            foreach($replies as $replie){
+                $replies->delete();
+            }
+        }
 
-	// Replies
-	$replies = Replies::where('user_id', '=', $id)->get();
+        // Likes
+        $likes = Like::where('user_id', '=', $id)->get();
+        if( isset( $likes ) ){
+            foreach($likes as $like){
+                $like->delete();
+            }
+        }
 
-	if( isset( $replies ) ){
-		foreach($replies as $replie){
-			$replies->delete();
-		}
-	}
+        // Downloads
+        $downloads = Downloads::where('user_id', '=', $id)->get();
+        if( isset( $downloads ) ){
+            foreach($downloads as $download){
+                $download->delete();
+            }
+        }
 
-	// Likes
-	$likes = Like::where('user_id', '=', $id)->get();
-	if( isset( $likes ) ){
-		foreach($likes as $like){
-			$like->delete();
-		}
-	}
+        // Followers
+        $followers = Followers::where( 'follower', $id )->orwhere('following',$id)->get();
+        if( isset( $followers ) ){
+            foreach($followers as $follower){
+                $follower->delete();
+            }
+        }
 
-	// Downloads
-	$downloads = Downloads::where('user_id', '=', $id)->get();
-	if( isset( $downloads ) ){
-		foreach($downloads as $download){
-			$download->delete();
-		}
-	}
+        // Delete Notification
+        $notifications = Notifications::where('author',$id)
+                            ->orWhere('destination', $id)
+                            ->get();
 
-	// Followers
-	$followers = Followers::where( 'follower', $id )->orwhere('following',$id)->get();
-	if( isset( $followers ) ){
-		foreach($followers as $follower){
-			$follower->delete();
-		}
-	}
+        if(  isset( $notifications ) ){
+            foreach($notifications as $notification){
+                $notification->delete();
+            }
+        }
 
-	// Delete Notification
-	$notifications = Notifications::where('author',$id)
-	->orWhere('destination', $id)
-	->get();
+        // Images Reported
+        $images_reporteds = ImagesReported::where('user_id', '=', $id)->get();
 
-	if(  isset( $notifications ) ){
-		foreach($notifications as $notification){
-			$notification->delete();
-		}
-	}
+        if(  isset( $images_reporteds ) ){
+            foreach ($images_reporteds as $images_reported ) {
+                $images_reported->delete();
+            }// End
+        }
 
-	// Images Reported
-	$images_reporteds = ImagesReported::where('user_id', '=', $id)->get();
+        // Images
+        $images = Images::where('user_id', '=', $id)->get();
 
-	if(  isset( $images_reporteds ) ){
-		foreach ($images_reporteds as $images_reported ) {
-				$images_reported->delete();
-			}// End
-	}
+        if(isset( $images )){
+            foreach($images as $image){
 
-	// Images
-    $images = Images::where('user_id', '=', $id)->get();
+                //<---- ALL RESOLUTIONS IMAGES
+                $stocks = Stock::where('images_id', '=', $image->id)->get();
 
-	if(isset( $images )){
-		foreach($images as $image){
+                foreach($stocks as $stock){
 
-			//<---- ALL RESOLUTIONS IMAGES
-			$stocks = Stock::where('images_id', '=', $image->id)->get();
+                    // $stock_path = 'public/uploads/'.$stock->type.'/'.$stock->name;
+                    $stock_path = config('path.uploads').$stock->type.'/'.$stock->name;
 
-			foreach($stocks as $stock){
+                    // Delete Stock
+                    // if ( \File::exists($stock_path) ) {
+                    // 	\File::delete($stock_path);
+                    // }//<--- IF FILE EXISTS
+                    if(Storage::disk('s3')->exists($stock_path)) {
+                        Storage::disk('s3')->delete($stock_path);
+                    }
 
-				$stock_path = 'public/uploads/'.$stock->type.'/'.$stock->name;
+                    $stock->delete();
+                }
 
-				// Delete Stock
-				if ( \File::exists($stock_path) ) {
-					\File::delete($stock_path);
-				}//<--- IF FILE EXISTS
+                // $preview_image = 'public/uploads/preview/'.$image->preview;
+                // $thumbnail     = 'public/uploads/thumbnail/'.$image->thumbnail;
+                $preview_image = config('path.preview').$image->preview;
+                $thumbnail     = config('path.thumbnail').$image->thumbnail;
 
-				$stock->delete();
-			}
+                // Delete preview
+                // if ( \File::exists($preview_image) ) {
+                // 	\File::delete($preview_image);
+                // }//<--- IF FILE EXISTS
+                if(Storage::disk('s3')->exists($preview_image)) {
+                    Storage::disk('s3')->delete($preview_image);
+                }
 
-			$preview_image = 'public/uploads/preview/'.$image->preview;
-			$thumbnail     = 'public/uploads/thumbnail/'.$image->thumbnail;
+                // Delete thumbnail
+                // if ( \File::exists($thumbnail) ) {
+                // 	\File::delete($thumbnail);
+                // }//<--- IF FILE EXISTS
+                if(Storage::disk('s3')->exists($thumbnail)) {
+                    Storage::disk('s3')->delete($thumbnail);
+                }
 
-			// Delete preview
-			if ( \File::exists($preview_image) ) {
-				\File::delete($preview_image);
-			}//<--- IF FILE EXISTS
+                $image->delete();
+            }
+        }// End
 
-			// Delete thumbnail
-			if ( \File::exists($thumbnail) ) {
-				\File::delete($thumbnail);
-			}//<--- IF FILE EXISTS
+        // User Reported
+        $users_reporteds = UsersReported::where('user_id', '=', $id)
+                                ->orWhere('id_reported', '=', $id)
+                                ->get();
 
-			$image->delete();
-		}
-	}// End
+        if(  isset( $users_reporteds ) ){
+            foreach ($users_reporteds as $users_reported ) {
+                $users_reported->delete();
+            }// End
+        }
 
-	// User Reported
-	$users_reporteds = UsersReported::where('user_id', '=', $id)->orWhere('id_reported', '=', $id)->get();
+        //<<<-- Delete Avatar -->>>/
+        // $fileAvatar    = 'public/avatar/'.$user->avatar;
+        $fileAvatar = config('path.avatar'.$user->avatar);
 
-	if(  isset( $users_reporteds ) ){
-		foreach ($users_reporteds as $users_reported ) {
-				$users_reported->delete();
-			}// End
-	}
+        // if ( \File::exists($fileAvatar) && $user->avatar != 'default.jpg' ) {
+        if(Storage::disk('s3')->exists($fileAvatar)
+            && $user->avatar != 'default.jpg') {
+            // \File::delete($fileAvatar);
+            Storage::disk('s3')->delete($fileAvatar);
+        }//<--- IF FILE EXISTS
 
-	//<<<-- Delete Avatar -->>>/
-	$fileAvatar    = 'public/avatar/'.$user->avatar;
+        //<<<-- Delete Cover -->>>/
+        // $fileCover  = 'public/cover/'.$user->cover;
+        $fileCover  = config('path.cover'.$user->cover);
 
-		if ( \File::exists($fileAvatar) && $user->avatar != 'default.jpg' ) {
-			\File::delete($fileAvatar);
-		}//<--- IF FILE EXISTS
+        // if ( \File::exists($fileCover) && $user->cover != 'cover.jpg' ) {
+        if(Storage::disk('s3')->exists($fileCover)
+            && $user->cover != 'cover.jpg') {
+            // \File::delete($fileCover);
+            Storage::disk('s3')->delete($fileCover);
+        }//<--- IF FILE EXISTS
 
-	//<<<-- Delete Cover -->>>/
-	$fileCover  = 'public/cover/'.$user->cover;
-
-		if ( \File::exists($fileCover) && $user->cover != 'cover.jpg' ) {
-			\File::delete($fileCover);
-		}//<--- IF FILE EXISTS
-
-	  // User Delete
-      $user->delete();
-
+        // User Delete
+        $user->delete();
     }//<-- End Method
 }

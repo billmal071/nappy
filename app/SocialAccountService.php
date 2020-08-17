@@ -4,6 +4,7 @@ namespace App;
 use App\Models\User;
 use App\Helper;
 use Laravel\Socialite\Contracts\User as ProviderUser;
+use Illuminate\Support\Facades\Storage;
 
 class SocialAccountService
 {
@@ -49,7 +50,8 @@ class SocialAccountService
 
                 $fileContents = file_get_contents($avatarUser);
 
-                \File::put(public_path().'/avatar/'.$nameAvatar.'.jpg', $fileContents);
+                // \File::put(public_path().'/avatar/'.$nameAvatar.'.jpg', $fileContents);
+                Storage::disk('s3')->put(config('path.avatar').$nameAvatar.'.jpg', $fileContents, 'public');
 
                 $avatar = $nameAvatar.'.jpg';
             }

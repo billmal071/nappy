@@ -42,9 +42,9 @@ return [
       ],
 
     'twitter' => [
-      'client_id' => "APP_ID", // configure with your app id
-      'client_secret' => 'APP_SECRET', // your app secret
-      'redirect' => 'http://YOURSITE.COM/oauth/twitter/callback', // IMPORTANT NOT REMOVE /oauth/twitter/callback
+      'client_id' => env('TWITTER_APP_ID'), // configure with your app id
+      'client_secret' => env('TWITTER_APP_SECRET'), // your app secret
+      'redirect' => 'https://beta.nappy.co/oauth/twitter/callback', // IMPORTANT NOT REMOVE /oauth/twitter/callback
       ],
 
 ];
