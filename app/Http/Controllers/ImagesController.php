@@ -703,7 +703,7 @@ class ImagesController extends Controller
             //<<<<---/ Download Check User
 
             // $pathFile = 'public/uploads/'.$type.'/'.$getImage->name;
-            $pathFile = Storage::disk('s3')->url(config('path.uploads').$type.'/'.$getImage->name);
+            $pathFile = config('path.'.$type).$getImage->name;
 
             if($request->ajax()) {
                 return [
@@ -720,7 +720,10 @@ class ImagesController extends Controller
                 'Expires' => '0'
             ];
 
-            return response()->download($pathFile, $image->title.' - '.$getImage->resolution.'.'.$image->extension, $headers);
+            // return response()->download($pathFile, $image->title.' - '.$getImage->resolution.'.'.$image->extension, $headers);
+
+            $fileName = $image->title.' - '.$getImage->resolution.'.'.$image->extension;
+            return Storage::disk('s3')->download($pathFile, $fileName, $headers);
         }
     }//<--- End Method
 
