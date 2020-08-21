@@ -1,6 +1,6 @@
 @foreach( $data as $user )
 
-<?php
+@php
 if( Auth::check() ) {
     $followActive = $user->followers()
                         ->where( 'follower', Auth::user()->id )
@@ -16,21 +16,21 @@ if( Auth::check() ) {
         $activeFollow = '';
     }
 
- }//<<<<---- Auth
- ?>
+}//<<<<---- Auth
+@endphp
 
  <article class="container-user">
     <div class="media">
         <div class="media-left">
             <a href="{{url($user->username)}}">
                 <img
+                    loading="lazy"
                     @if($user->avatar == 'default.jpg')
-                        src={{ url('public/avatar', $user->avatar) }}
-
+                        src={{ url('public/avatar', 'default.jpg') }}
                     @else
-                        src="{{ App\Helper::getUrlFromS3('path.avatar', $user->avatar) }}"
+                        src="{{ App\Helper::imgixUrl('path.avatar', $user->avatar) }}"
                     @endif
-                class="img-circle avatar-user">
+                    class="img-circle avatar-user">
             </a>
         </div>
         <div class="media-body text-overflow">

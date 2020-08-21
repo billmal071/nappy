@@ -13,6 +13,7 @@
         "chumper/zipper": "1.0.x",
         "fideloper/proxy": "^4.0",
         "guzzlehttp/guzzle": "~5.3|~6.0",
+        "imgix/imgix-php": "dev-main",
         "intervention/image": "^2.5",
         "laravel/cashier": "^10.2",
         "laravel/framework": "5.8.*",

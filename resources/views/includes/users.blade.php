@@ -23,12 +23,11 @@ if( Auth::check() ) {
         <a href="{{url($user->username)}}">
             <img
                 {{-- src="{{ App\Helper::getUrlFromS3('path.avatar',$user->avatar) }}" --}}
+                loading="lazy"
                 @if($user->avatar == 'default.jpg')
-                    src={{ url('public/avatar', $user->avatar) }}
-
+                    src={{ url('public/avatar', 'default.jpg') }}
                 @else
-                    src="{{ App\Helper::getUrlFromS3('path.avatar', $user->avatar) }}"
-
+                    src="{{ App\Helper::imgixUrl('path.avatar', $user->avatar) }}"
                 @endif
                 class="img-circle avatar-user">
         </a>

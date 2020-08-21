@@ -31,7 +31,14 @@
     <meta name="keywords" content="@yield('keywords_custom'){{ $settings->keywords }}" />
     <link rel="shortcut icon" href="{{ asset('public/img/favicon.png') }}" />
 
-    <title>{{$totalNotifications}}@section('title')@show @if( isset( $settings->title ) ){{$settings->title}}@endif</title>
+    <title>
+        {{$totalNotifications}}
+        @section('title')
+        @show
+        @if( isset( $settings->title ) )
+            {{$settings->title}}
+        @endif
+    </title>
 
     @include('includes.css_general')
 
@@ -49,58 +56,55 @@
 
     @include('includes.javascript_general')
     <link href="{{ asset('public/plugins/iCheck/all.css') }}" rel="stylesheet" type="text/css" />
+
     @if( Auth::check() )
-<script type="text/javascript">
-//<----- Notifications
-function Notifications() {
+        <script type="text/javascript">
+            //<----- Notifications
+            function Notifications() {
 
-     var _title = '@section("title")@show {{e($settings->title)}}';
+                var _title = '@section("title")@show {{e($settings->title)}}';
 
-     console.time('cache');
+                console.time('cache');
 
-     $.get(URL_BASE+"/ajax/notifications", function( data ) {
-        if ( data ) {
+                $.get(URL_BASE+"/ajax/notifications", function( data ) {
+                    if ( data ) {
+                        //* Notifications */
+                        if( data.notifications != 0 ) {
+                            var totalNoty = data.notifications;
+                            $('#noti_connect').html(data.notifications).fadeIn();
+                        } else {
+                            $('#noti_connect').html('').hide();
+                        }
 
-            //* Notifications */
-            if( data.notifications != 0 ) {
+                        //* Error */
+                        if( data.error == 1 ) { window.location.reload() }
 
-                var totalNoty = data.notifications;
-                $('#noti_connect').html(data.notifications).fadeIn();
-            } else {
-                $('#noti_connect').html('').hide();
-            }
+                        var totalGlobal = parseInt( totalNoty );
 
-            //* Error */
-            if( data.error == 1 ) {
-                window.location.reload();
-            }
+                        if( data.notifications == 0 ) {
+                            $('.notify').hide();
+                            $('title').html( _title );
+                        }
 
-            var totalGlobal = parseInt( totalNoty );
+                        if( data.notifications != 0 ) {
+                            $('title').html( "("+ totalGlobal + ") " + _title );
+                        }
 
-            if( data.notifications == 0 ) {
-                $('.notify').hide();
-                $('title').html( _title );
-            }
+                    }//<-- DATA
+                },'json');
 
-        if( data.notifications != 0 ) {
-            $('title').html( "("+ totalGlobal + ") " + _title );
-          }
+                console.timeEnd('cache');
+            }//End Function TimeLine
 
-        }//<-- DATA
-
-        },'json');
-
-        console.timeEnd('cache');
-}//End Function TimeLine
-
-timer = setInterval("Notifications()", 10000);
-</script>
-@endif
+            timer = setInterval("Notifications()", 10000);
+        </script>
+    @endif
 
 </head>
+
 <body>
-@if( isset( $settings->google_analytics ) )
-    <?php echo html_entity_decode($settings->google_analytics) ?>
+    @if( isset( $settings->google_analytics ) )
+        <?php echo html_entity_decode($settings->google_analytics) ?>
     @endif
 
     <div class="popout font-default"></div>
@@ -111,65 +115,76 @@ timer = setInterval("Notifications()", 10000);
     </div>
 
     @if(!Request::is('/') && !Request::is('search') )
-    <form role="search" class="box_Search collapse" autocomplete="off" action="{{ url('search') }}" method="get" id="formShow">
-    <div>
-      <input type="text" name="q" class="input_search form-control" id="btnItems" placeholder="{{trans('misc.search')}}">
-      <button type="submit" id="_buttonSearch"><i class="icon-search"></i></button>
-    </div><!--/.form-group -->
-   </form><!--./navbar-form -->
-             @endif
+        <form
+            role="search"
+            class="box_Search collapse"
+            autocomplete="off"
+            action="{{ url('search') }}"
+            method="get"
+            id="formShow">
+            <div>
+                <input
+                    type="text"
+                    name="q"
+                    class="input_search form-control"
+                    id="btnItems"
+                    placeholder="{{trans('misc.search')}}">
+                <button type="submit" id="_buttonSearch">
+                    <i class="icon-search"></i>
+                </button>
+            </div><!--/.form-group -->
+        </form><!--./navbar-form -->
+    @endif
 
     @include('includes.navbar')
 
-@if( Auth::check() && Auth::user()->status == 'pending' )
-  <div class="alert alert-danger text-center margin-zero border-group">
-  <i class="icon-warning myicon-right"></i> {{trans('misc.confirm_email')}} <strong>{{ Auth::user()->email}}</strong>
-  </div>
-  @endif
+    @if( Auth::check() && Auth::user()->status == 'pending' )
+        <div class="alert alert-danger text-center margin-zero border-group">
+            <i class="icon-warning myicon-right"></i>
+            {{trans('misc.confirm_email')}}
+            <strong>{{ Auth::user()->email}}</strong>
+        </div>
+    @endif
 
-        @yield('content')
-
-        @include('includes.footer')
-
-        {{-- @include('includes.javascript_general') --}}
-
+    @yield('content')
+    @include('includes.footer')
+    {{-- @include('includes.javascript_general') --}}
     @yield('javascript')
 
     @include('includes.javascript_image_details')
     <script src="{{ asset('public/plugins/iCheck/icheck.min.js') }}"></script>
-  <script type="text/javascript">
-
-    Cookies.set('cookieBanner');
-
+    <script type="text/javascript">
+        Cookies.set('cookieBanner');
         $(document).ready(function() {
-    if (Cookies('cookiePolicySite'));
-    else {
-        $('.showBanner').fadeIn();
-        $("#close-banner").click(function() {
-            $(".showBanner").slideUp(50);
-            Cookies('cookiePolicySite', true);
+            if (Cookies('cookiePolicySite'));
+            else {
+                $('.showBanner').fadeIn();
+                $("#close-banner").click(function() {
+                    $(".showBanner").slideUp(50);
+                    Cookies('cookiePolicySite', true);
+                });
+            }
         });
-    }
-});
 
-var goHistoryCount = 0;
+        var goHistoryCount = 0;
 
-$(document).ready(function(){
-    $(".previewImage").removeClass('d-none');
-});
+        $(document).ready(function(){
+            $(".previewImage").removeClass('d-none');
+        });
 
-    $(document).on('click', '.image-btn', 
-        function () {
+        // $(document).on('click', '.image-btn', function() {
+        $(document).on('click', '.image-btn', function() {
+            var imgId = $(this).data('img-id');
             var imgDetailUrl = "{{ url('photo') }}/" + $(this).data('img-id');
-            $.get(imgDetailUrl, function(data){
+
+            $.get('/photo/'+imgId, function(data){
+                let result = jQuery(data.detail).find("#test");
                 $('#modal-body-id').children().remove();
-                $('#modal-body-id').append(data.detail);
                 $('#modalImageDeatails-btn').click();
-            })
+                $('#modal-body-id').append(result.prevObject[0]);
+            });
 
-            history.pushState("", "", "/photo/"+$(this).data('img-id'));
-
-            var imgId = $(this).data('img-id')
+            history.pushState("", "", "/photo/" + $(this).data('img-id'));
 
             // check if no more previous photos
             var firstImg = $("#imagesFlex").children().first().data("img-id")
@@ -183,6 +198,7 @@ $(document).ready(function(){
 
             // check if no more next photos
             var lastImg = $("#imagesFlex").children().last().data("img-id")
+
             if (imgId == lastImg) {
                 $(this).removeClass('active-prev-next-btn')
                 $('.img-det-next').addClass('inactive-prev-next-btn')
@@ -190,31 +206,28 @@ $(document).ready(function(){
                 $(this).removeClass('inactive-prev-next-btn')
                 $('.img-det-next').addClass('active-prev-next-btn')
             }
+        });
 
-       }
-    );
-
-    // Event when selecting Previous photo
-    $(document).on('click', '.img-det-prev', 
-        function() {
+        // Event when selecting Previous photo
+        $(document).on('click', '.img-det-prev', function() {
             var currLoc = window.location.href;
             var rtUrl = "{{ url('photo') }}/";
-            var imgId = currLoc.replace(rtUrl, "")
+            var imgId = currLoc.replace(rtUrl, "");
 
-            var prevId = $("#imagesFlex").find(`#${imgId}`).prev().data("img-id")
-            var firstImg = $("#imagesFlex").children().first().data("img-id")
+            var prevId = $("#imagesFlex").find(`#${imgId}`).prev().data("img-id");
+            var firstImg = $("#imagesFlex").children().first().data("img-id");
 
             // check if no more previous photos
             if (prevId == firstImg) {
-                $(this).removeClass('active-prev-next-btn')
-                $(this).addClass('inactive-prev-next-btn')
+                $(this).removeClass('active-prev-next-btn');
+                $(this).addClass('inactive-prev-next-btn');
             } else {
-                $(this).removeClass('inactive-prev-next-btn')
-                $(this).addClass('active-prev-next-btn')
+                $(this).removeClass('inactive-prev-next-btn');
+                $(this).addClass('active-prev-next-btn');
             }
 
-            $('.img-det-next').removeClass('inactive-prev-next-btn')
-            $('.img-det-next').addClass('active-prev-next-btn')
+            $('.img-det-next').removeClass('inactive-prev-next-btn');
+            $('.img-det-next').addClass('active-prev-next-btn');
 
             var imgDetailUrl = rtUrl + prevId;
             $.get(imgDetailUrl, function(data){
@@ -223,72 +236,68 @@ $(document).ready(function(){
                 $('.rel-flex-img').flexImages({ maxRows: 1, truncate: true });
                 goHistoryCount++;
                 history.pushState("", "", `/photo/${prevId}`);
-            })
-    })
+            });
+        });
 
-    // Event when selecting Next photo
-    $(document).on('click', '.img-det-next', 
-        function() {
+        // Event when selecting Next photo
+        $(document).on('click', '.img-det-next', function() {
             var currLoc = window.location.href;
             var rtUrl = "{{ url('photo') }}/";
-            var imgId = currLoc.replace(rtUrl, "")
+            var imgId = currLoc.replace(rtUrl, "");
 
-            var nextId = $("#imagesFlex").find(`#${imgId}`).next().data("img-id")
-            var lastImg = $("#imagesFlex").children().last().data("img-id")
+            var nextId = $("#imagesFlex").find(`#${imgId}`).next().data("img-id");
+            var lastImg = $("#imagesFlex").children().last().data("img-id");
 
             // check if no more next photos
             if (nextId == lastImg) {
-                $(this).removeClass('active-prev-next-btn')
-                $('.img-det-next').addClass('inactive-prev-next-btn')
+                $(this).removeClass('active-prev-next-btn');
+                $('.img-det-next').addClass('inactive-prev-next-btn');
             } else {
-                $(this).removeClass('inactive-prev-next-btn')
-                $('.img-det-next').addClass('active-prev-next-btn')
+                $(this).removeClass('inactive-prev-next-btn');
+                $('.img-det-next').addClass('active-prev-next-btn');
             }
 
-            $('.img-det-prev').removeClass('inactive-prev-next-btn')
-            $('.img-det-prev').addClass('active-prev-next-btn')
+            $('.img-det-prev').removeClass('inactive-prev-next-btn');
+            $('.img-det-prev').addClass('active-prev-next-btn');
 
             var imgDetailUrl = rtUrl + nextId;
-             $.get(imgDetailUrl, function(data){
+                $.get(imgDetailUrl, function(data){
                 $('#modal-body-id').children().remove();
                 $('#modal-body-id').append(data.detail);
                 $('.rel-flex-img').flexImages({ maxRows: 1, truncate: true });
                 goHistoryCount++;
                 history.pushState("", "", `/photo/${nextId}`);
-            })
-    })
+            });
+        });
 
-    $(document).on('click', '#coll-md-btn', 
-        function() {
+        $(document).on('click', '#coll-md-btn', function() {
             $('input').iCheck({
                 radioClass: 'iradio_flat-green',
                 checkboxClass: 'icheckbox_square-green',
             });
-        }
-    );
+        });
 
-    $(document).on('ifChecked', 'input', function() {
-        var _element = $(this).closest('label');
-        var imageID  = _element.attr("data-image-id");
-        var collectionID  = _element.attr("data-collection-id");
+        $(document).on('ifChecked', 'input', function() {
+            var _element = $(this).closest('label');
+            var imageID  = _element.attr("data-image-id");
+            var collectionID  = _element.attr("data-collection-id");
 
-        $.ajax({
-            headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-           type: "GET",
-           url: URL_BASE+'/collection/'+collectionID+'/i/'+imageID,
-           dataType: 'json',
-           data: null,
-           success: function( response ) {
-                 $('#collections').modal('hide');
-            $('.popout').addClass('alert-success').html(response.data).fadeIn(500).delay(5000).fadeOut();
-           }
-
-       });
-    });
-
-</script>
-
+            $.ajax({
+                headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: "GET",
+                url: URL_BASE+'/collection/'+collectionID+'/i/'+imageID,
+                dataType: 'json',
+                data: null,
+                success: function( response ) {
+                    $('#collections').modal('hide');
+                    $('.popout')
+                        .addClass('alert-success')
+                        .html(response.data);
+                }
+            });
+        });
+    </script>
 </body>
 </html>

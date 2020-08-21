@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ea90da13e876c36022ac0057b92399fb",
+    "content-hash": "bc344a6f02c8655f9b18a8da49eac31b",
     "packages": [
         {
             "name": "albertcht/invisible-recaptcha",
@@ -928,6 +928,42 @@
                 "url"
             ],
             "time": "2019-07-01T23:21:34+00:00"
+        },
+        {
+            "name": "imgix/imgix-php",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/imgix/imgix-php.git",
+                "reference": "adad1a5197f67909bf6cefc31729f3a35251ce2b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/imgix/imgix-php/zipball/adad1a5197f67909bf6cefc31729f3a35251ce2b",
+                "reference": "adad1a5197f67909bf6cefc31729f3a35251ce2b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Imgix\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-2-Clause"
+            ],
+            "description": "A PHP client library for generating URLs with imgix.",
+            "keywords": [
+                "imgix"
+            ],
+            "time": "2020-08-04T21:15:37+00:00"
         },
         {
             "name": "intervention/image",
@@ -7119,6 +7155,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "imgix/imgix-php": 20,
         "fahim/laravel5-paypal-ipn": 20
     },
     "prefer-stable": true,

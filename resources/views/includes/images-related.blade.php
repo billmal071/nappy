@@ -12,7 +12,7 @@
 
 	if($image->extension == 'png' ) {
 		// $background = 'background: url('.url('public/img/pixel.gif').') repeat center center #e4e4e4;';
-		$background = 'background: url('.App\Helper::getUrlFromS3('path.img', 'pixel.gif').') repeat center center #e4e4e4;';
+		$background = 'background: url('.App\Helper::imgixUrl('path.img', 'pixel.gif').') repeat center center #e4e4e4;';
 	}  else {
 		$background = 'background-color: #'.$color.'';
 	}
@@ -32,7 +32,7 @@
         $newHeight = $resolution[1];
 
 		// $thumbnail = Storage::disk('s3')->url(config('path.small').$stockImage->name);
-        $thumbnail = App\Helper::getUrlFromS3('path.small', $stockImage->name);
+        $thumbnail = App\Helper::imgixUrl('path.small', $stockImage->name);
 	}
 @endphp
 <!-- Start Item -->
@@ -48,7 +48,15 @@
     <span class="hover-content">
         <span class="sub-hover">
             <span class="myicon-right" style="float: left;">
-                <img src="{{App\Helper::getUrlFromS3('path.avatar', $image->user()->avatar)}}" alt="User" class="img-circle profile-img">
+                <img
+                    loading="lazy"
+                    @if ($image->user()->avatar == 'default.jpg')
+                        src="{{ url('public/avatar', 'default.jpg') }}"
+                    @else
+                        src="{{App\Helper::imgixUrl('path.avatar', $image->user()->avatar)}}"
+                    @endif
+                    alt="User"
+                    class="img-circle profile-img">
                 {{-- <img src="{{ url('public/avatar/',$image->user()->avatar) }}" alt="User" class="img-circle profile-img"> --}}
                 <em>{{$image->user()->username}}</em>
             </span>
@@ -57,7 +65,10 @@
         </span><!-- Span Out -->
     </span><!-- hover-content -->
 
-        <img src="{{App\Helper::getUrlFromS3('path.small', $stockImages{0}->name)}}" class="previewImage" />
+        <img
+            loading="lazy"
+            src="{{App\Helper::imgixUrl('path.small', $stockImages{0}->name)}}" 
+            class="previewImage" />
         {{-- <img src="{{ Storage::disk('s3')->url(config('path.small').$stockImages{0}->name) }}" class="previewImage" /> --}}
 </a><!-- End Item -->
 @endforeach

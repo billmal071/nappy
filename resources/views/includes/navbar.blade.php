@@ -118,7 +118,12 @@ if( Auth::check() ) {
                       <a href="javascript:void(0);" data-toggle="dropdown" class="userAvatar myprofile dropdown-toggle font-default text-capitalize">
                             {{-- <img src="{{ asset('public/avatar').'/'.$userAuth->avatar }}" alt="User" class="img-circle avatarUser" width="21" height="21"> --}}
                             <img
-                                src="{{App\Helper::getUrlFromS3('path.avatar', $userAuth->avatar)}}"
+                                loading="lazy"
+                                @if ($userAuth->avatar == 'default.jpg')
+                                    src="{{ url('public/avatar', 'default.jpg') }}"
+                                @else
+                                    src="{{App\Helper::imgixUrl('path.avatar', $userAuth->avatar)}}"
+                                @endif
                                 alt="User"
                                 class="img-circle avatarUser"
                                 width="21"

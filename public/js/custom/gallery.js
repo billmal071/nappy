@@ -47,12 +47,11 @@ $(document).ready(function() {
             $('.modal-backdrop').remove();
 
             // Go back to the url before opening the modal
-            history.go((-1)-goHistoryCount);
-            goHistoryCount=0;
-
+            // history.go((-1)-goHistoryCount);
+            // goHistoryCount=0;
+            history.pushState("", "", "/");
             $('body').css('overflow-y', 'auto');
         } else {
-            
             $('body').css('overflow-y', 'hidden');
         }
     });

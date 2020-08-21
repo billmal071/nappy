@@ -86,10 +86,12 @@
                       <td>{{ $user->id }}</td>
                       <td>
 						<img
+							loading="lazy"
 							@if($user->avatar == 'default.jpg')
-								src="{{asset('public/avatar').'/'.$user->avatar}}"
+								src="{{url('public/avatar').'default.jpg'}}"
+							@else
+								src="{{ App\Helper::imgixUrl('path.avatar', $user->avatar) }}"
 							@endif
-							src="{{ App\Helper::getUrlFromS3('path.avatar', $user->avatar) }}"
 							width="20"
 							height="20"
 							class="img-circle" />

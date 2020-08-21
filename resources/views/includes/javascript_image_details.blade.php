@@ -159,28 +159,26 @@
 
     //<----*********** addImageCollection ************------>
     function addImageCollection() {
-      $(document).on('click', '.addImageCollection', 
-      function () {
-      // $(".addImageCollection").click(function(){
-        var _element = $(this);
-        var imageID  = _element.attr("data-image-id");
-        var collectionID  = _element.attr("data-collection-id");
+        $(document).on('click', '.addImageCollection', function () {
+            // $(".addImageCollection").click(function(){
+            var _element = $(this);
+            var imageID  = _element.attr("data-image-id");
+            var collectionID  = _element.attr("data-collection-id");
 
-        $.ajax({
-          headers: {
-              'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-           type: "GET",
-           url: URL_BASE+'/collection/'+collectionID+'/i/'+imageID,
-           dataType: 'json',
-           data: null,
-           success: function( response ) {
-             $('#collections').modal('hide');
-            $('.popout').addClass('alert-success').html(response.data).fadeIn(500).delay(5000).fadeOut();
-           }
-
-         });
-      });
+            $.ajax({
+                headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                type: "GET",
+                url: URL_BASE+'/collection/'+collectionID+'/i/'+imageID,
+                dataType: 'json',
+                data: null,
+                success: function( response ) {
+                    $('#collections').modal('hide');
+                    $('.popout').addClass('alert-success').html(response.data);
+                }
+            });
+        });
     }//<----*********** Click addImageCollection ************------>
 
     addImageCollection();

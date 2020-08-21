@@ -106,14 +106,30 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <!-- Menu Toggle Button -->
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                   <!-- The user image in the navbar-->
-                  <img src="{{ asset('public/avatar').'/'.Auth::user()->avatar }}" class="user-image" alt="User Image" />
+                  <img
+                    loading="lazy"
+                    @if(Auth::user()->avatar == 'default.jpg')
+                        src={{ url('public/avatar', 'default.jpg') }}
+                    @else
+                        src="{{ App\Helper::imgixUrl('path.avatar', Auth::user()->avatar) }}"
+                    @endif
+                    class="user-image"
+                    alt="User Image" />
                   <!-- hidden-xs hides the username on small devices so only the image appears. -->
                   <span class="hidden-xs">{{ Auth::user()->username }}</span>
                 </a>
                 <ul class="dropdown-menu">
                   <!-- The user image in the menu -->
                   <li class="user-header">
-                    <img src="{{ asset('public/avatar').'/'.Auth::user()->avatar }}" class="img-circle" alt="User Image" />
+                    <img
+                      loading="lazy"
+                      @if(Auth::user()->avatar == 'default.jpg')
+                          src={{ url('public/avatar', 'default.jpg') }}
+                      @else
+                          src="{{ App\Helper::imgixUrl('path.avatar', Auth::user()->avatar) }}"
+                      @endif
+                      class="img-circle"
+                      alt="User Image" />
                     <p>
                       <small>{{ Auth::user()->username }}</small>
                     </p>
@@ -146,7 +162,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <div class="pull-left image">
               {{-- <img src="{{ asset('public/avatar').'/'.Auth::user()->avatar }}" class="img-circle" alt="User Image" /> --}}
               <img
-                src="{{App\Helper::getUrlFromS3('path.avatar', Auth::user()->avatar)}}"
+                loading="lazy"
+                @if(Auth::user()->avatar == 'default.jpg')
+                    src={{ url('public/avatar', 'default.jpg') }}
+                @else
+                    src="{{ App\Helper::imgixUrl('path.avatar', Auth::user()->avatar) }}"
+                @endif
                 class="img-circle"
                 alt="User Image" />
             </div>

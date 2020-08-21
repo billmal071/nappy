@@ -73,10 +73,10 @@
 
 					$('.hovercard').hover(
 		               function () {
-		                  $(this).find('.hover-content').fadeIn();
+		                  $(this).find('.hover-content');
 		               },
 		               function () {
-		                  $(this).find('.hover-content').fadeOut();
+		                  $(this).find('.hover-content');
 		               }
 		            );
 

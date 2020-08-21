@@ -279,7 +279,7 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
     $('.showTooltip').tooltip();
 
     $('.delete-attach-image').click(function(){
-    	$('.imageContainer').fadeOut(100);
+    	$('.imageContainer');
     	$('#previewImage').css({ backgroundImage : 'none'});
     	$('.file-name').html('');
     	$('#uploadImage').val('');
@@ -287,14 +287,14 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
     });
 
     $('.delete-attach-file').click(function(){
-    	$('.fileContainer').fadeOut(100);
+    	$('.fileContainer');
     	$('#previewFile').css({ backgroundImage : 'none'});
     	$('.file-name-file').html('');
     	$('#uploadFile').val('');
     });
 
     $('.delete-attach-file-2').click(function(){
-    	$('.fileContainer').fadeOut(100);
+    	$('.fileContainer');
     	$('.file-name-file').html('');
     	$('#attach_file').val('');
     });
@@ -534,7 +534,7 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
 					 if( result.success != false ){
 					 		$('#message').val('');
 							 $('#button_message').html(dataSent);
-							 $('.popout').html(dataSuccess).css('background-color','#258A0F').fadeIn(500).delay(4000).fadeOut();
+							 $('.popout').html(dataSuccess).css('background-color','#258A0F');
 							 $('#myModal').modal('hide');
 							 $('#button_message').removeAttr('disabled');
 							 $('#errors').html('').fadeOut();
@@ -555,7 +555,7 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
 								bootbox.alert(error, function() {
 								$('#myModal').modal('show');
 								});*/
-						$('#errors').html('<ul class="margin-zero padding-zero">'+error+'</ul>').fadeIn(500);
+						$('#errors').html('<ul class="margin-zero padding-zero">'+error+'</ul>');
 
 
 							$('#button_message').html(dataSent);
@@ -597,7 +597,7 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
 							xhr = '- ' + xhr;
 						}
 
-					 	$('.popout').addClass('popout-error').html($error+' '+xhr+'').fadeIn('500').delay('5000').fadeOut('500');
+					 	$('.popout').addClass('popout-error').html($error+' '+xhr+'');
 					     /*alert('status: ' + statusText + '\n\rresponseText: \n' + responseText + '\n\nxhr: \n' + xhr);*/
 					 },
 					 success:  function(result){
@@ -622,7 +622,7 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
                         }
 
 						$('#showErrors').html(error);
-						$('#dangerAlert').fadeIn(500)
+						$('#dangerAlert');
 
 						$('.wrap-loader').hide();
 						element.removeAttr('disabled');
@@ -664,7 +664,7 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
                             //error += '<div class="btn-block"><strong>* ' + result.errors[$key] + '</strong></div>';
                         }
 
-						$('#errors_shot').html('<ul class="margin-zero">'+error+'</ul>').fadeIn(500);
+						$('#errors_shot').html('<ul class="margin-zero">'+error+'</ul>');
 
                             $('#updateShot').removeAttr('disabled').html(dataSent);
 						}
@@ -708,7 +708,7 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
 
 	  		if( r == true ) {
 
-	  	 	element.parents('li').fadeTo( 200,0.00, function(){
+	  	 	element.parents('li').fadeTo( 0,0.00, function(){
    		             element.parents('li').slideUp( 200, function(){
    		  	           element.parents('li').remove();
    		              });
@@ -772,7 +772,7 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
                         	error += '<li>* ' + result.errors[$key] + '</li>';
                         }
 
-						$('#errors').html('<ul class="margin-zero">'+error+'</ul>').fadeIn(500);
+						$('#errors').html('<ul class="margin-zero">'+error+'</ul>');
 
                             $('#add_ad').removeAttr('disabled').html(dataSent);
 						}
@@ -804,8 +804,8 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
 					 //===== SUCCESS =====//
 					 if( result.success != false ){
 					 	   $('#removePanel').remove();
-					 		$('#success_response').fadeIn();
-					 		$('#errors').fadeOut();
+					 		$('#success_response');
+					 		$('#errors');
 					 		$('html, body').animate({scrollTop:0}, 500);
 						}//<-- e
 							else {
@@ -815,7 +815,7 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
                         	error += '<li>* ' + result.errors[$key] + '</li>';
                         }
 
-						$('#errors').html('<ul class="margin-zero">'+error+'</ul>').fadeIn(500);
+						$('#errors').html('<ul class="margin-zero">'+error+'</ul>');
 
                             $('#update_ad').removeAttr('disabled').html(dataSent);
 						}
@@ -854,7 +854,7 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
 					 if( result.success != false ){
 							 $('#myModalMail').modal('hide');
 							 $('#button_update_mail').removeAttr('disabled');
-							 $('#errors').html('').fadeOut();
+							 $('#errors').html('');
 
 						}//<-- e
 							else {
@@ -862,7 +862,7 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
                         for($key in result.errors){
                         	error += '<li>* ' + result.errors[$key] + '</li>';
                         }
-						$('#errors').html('<ul class="margin-zero padding-zero">'+error+'</ul>').fadeIn(500);
+						$('#errors').html('<ul class="margin-zero padding-zero">'+error+'</ul>');
                             $('#button_update_mail').removeAttr('disabled');
 							}
 							if( result.session_null ) {
@@ -899,24 +899,24 @@ $(document).on('mouseenter','.deletePhoto, .deleteCover, .deleteBg', function(){
 					 if( result.success != false ){
 					 	     $("#sendInvitation input").val('');
 							 $('#invite_friends').removeAttr('disabled');
-							 $('#success_invite').html(result.message).fadeIn();
+							 $('#success_invite').html(result.message);
 							 $('#errors').html('').fadeOut();
 
 						}//<-- e
 						else if( result.error_custom  ) {
 							$('#errors').html(result.error_custom).fadeIn(500);
 							$('#invite_friends').removeAttr('disabled');
-							$('#success_invite').html('').fadeOut();
+							$('#success_invite').html('');
 						}
 							else {
 
-						$('#success_invite').html('').fadeOut();
+						$('#success_invite').html('');
 
 						var error = '';
                         for($key in result.errors){
                         	error += '<li>* ' + result.errors[$key] + '</li>';
                         }
-						$('#errors').html('<ul class="margin-zero padding-zero">'+error+'</ul>').fadeIn(500);
+						$('#errors').html('<ul class="margin-zero padding-zero">'+error+'</ul>');
                             $('#invite_friends').removeAttr('disabled');
 							}
 							if( result.session_null ) {
@@ -967,11 +967,11 @@ $(document).on('click','.pagination a', function(){
 	$('.hovercard').hover(
 
 	   function () {
-	      $(this).find('.hover-content').fadeIn();
+	      $(this).find('.hover-content');
 	   },
 
 	   function () {
-	      $(this).find('.hover-content').fadeOut();
+	      $(this).find('.hover-content');
 	   }
 	);
 
@@ -1057,7 +1057,7 @@ $(document).on('click','.pagination a', function(){
 	            }
 
 				$('#showErrors').html(error);
-				$('#dangerAlert').fadeIn(500)
+				$('#dangerAlert');
 
 				element.removeAttr('disabled');
 
@@ -1109,7 +1109,7 @@ $("#editCollection").on('click',function(e){
 	            }
 
 				$('#showErrors').html(error);
-				$('#dangerAlert').fadeIn(500)
+				$('#dangerAlert');
 
 				element.removeAttr('disabled');
 		   	}
@@ -1135,7 +1135,7 @@ function addImageCollection() {
 		   data: null,
 		   success: function( response ) {
 				 $('#collections').modal('hide');
-		    $('.popout').addClass('alert-success').html(response.data).fadeIn(500).delay(5000).fadeOut();
+		    $('.popout').addClass('alert-success').html(response.data);
 		   }
 
 	   });
@@ -1167,8 +1167,8 @@ $("#commentSend").on('click',function(e){
 		   	if( result.success == true ){
 
 		   		$('#comments').val('');
-		   		$('#dangerAlertComments').fadeOut(1);
-		   		$( result.data ).hide().prependTo('.gridComments').fadeIn(500);
+		   		$('#dangerAlertComments');
+		   		$( result.data ).hide().prependTo('.gridComments');
 		   		jQuery(".timeAgo").timeago();
 		   		$('.noComments').remove();
 
@@ -1185,7 +1185,7 @@ $("#commentSend").on('click',function(e){
 	            }
 
 				$('#showErrorsComments').html(error);
-				$('#dangerAlertComments').fadeIn(500);
+				$('#dangerAlertComments');
 
 				element.removeAttr('disabled');
 		   	}
@@ -1222,14 +1222,14 @@ $(document).on('click','#button-reply-msg',function(s){
 		//===== SUCCESS =====//
 		if( result.success != false ){
 			 $('#message').val('');
-				$('#errors').html('').fadeOut();
+				$('#errors').html('');
 				$('#button-reply-msg').removeAttr('disabled').html(dataSent);
 
 
 		 }//<-- e
 		 else if( result.error_custom ) {
 			 $('#button-reply-msg').removeAttr('disabled').html(dataSent);
-			 $('#errors').html(result.error_custom).fadeIn(500);
+			 $('#errors').html(result.error_custom);
 		 }
 			 else {
 		 var error = '';
@@ -1237,7 +1237,7 @@ $(document).on('click','#button-reply-msg',function(s){
 									 error += '<li>* ' + result.errors[$key] + '</li>';
 								 }
 
-	 $('#errors').html('<ul class="margin-zero padding-zero">'+error+'</ul>').fadeIn(500);
+	 $('#errors').html('<ul class="margin-zero padding-zero">'+error+'</ul>');
 								 $('#button-reply-msg').removeAttr('disabled').html(dataSent);
 		 }
 

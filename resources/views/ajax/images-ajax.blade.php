@@ -12,14 +12,14 @@
                     ->first();
 
     if($image->extension == 'png' ) {
-        // $background = 'background: url('.url('public/img/pixel.gif').') repeat center center #e4e4e4;';
-        $background = 'background: url('.App\Helper::getUrlFromS3('path.img', 'pixel.gif').') repeat center center #e4e4e4;';
+        $background = 'background: url('.url('public/img/pixel.gif').') repeat center center #e4e4e4;';
+        // $background = 'background: url('.App\Helper::getUrlFromS3('path.img', 'pixel.gif').') repeat center center #e4e4e4;';
     }  else {
         $background = 'background-color: #'.$color.'';
     }
 
     if($settings->show_watermark == '1') {
-        $thumbnail = Storage::url(config('path.preview').$image->preview);
+        $thumbnail = App\Helper::imgxUrl('path.preview', $image->preview);
 
         $resolution = explode('x', App\Helper::resolutionPreview($imageLarge));
         $newWidth = $resolution[0];
@@ -34,7 +34,8 @@
         $newHeight = $resolution[1];
 
         // $thumbnail = Storage::disk('s3')->url(config('path.small').$stockImage->name);
-        $thumbnail = App\Helper::getUrlFromS3('path.small', $stockImage->name);
+        // $thumbnail = App\Helper::getUrlFromS3('path.small', $stockImage->name);
+        $thumbnail = App\Helper::imgixUrl('path.small', $stockImage->name);
     }
 @endphp
 <!-- Start Item -->
@@ -54,10 +55,12 @@
         <h5 class="text-overflow author-label mg-bottom-xs" title="{{$image->user()->username}}">
             <img
                 {{-- src="{{ url('public/avatar/',$image->user()->avatar) }}" --}}
+                lading="lazy"
                 @if($image->user()->avatar == 'default.jpg')
                     src={{ url('public/avatar', 'default.jpg') }}
+                @else
+                    src="{{ App\Helper::imgixUrl('path.avatar', $image->user()->avatar) }}"
                 @endif
-                src="{{ App\Helper::getUrlFromS3('path.avatar', $image->user()->avatar) }}"
                 alt="User"
                 class="img-circle"
                 style="width: 20px; height: 20px; display: inline-block; margin-right: 5px;">
@@ -87,7 +90,9 @@
     </span><!-- hover-content -->
 
     {{-- <img src="{{ url('public/uploads/small/',$stockImages{0}->name) }}" /> --}}
-    <img src="{{ App\Helper::getUrlFromS3('path.small', $stockImages{0}->name) }}" />
+    <img
+        loading="lazy"
+        src="{{ App\Helper::imgixUrl('path.small', $stockImages{0}->name) }}" />
 </a><!-- End Item -->
 @endforeach
 

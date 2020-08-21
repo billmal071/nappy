@@ -184,10 +184,12 @@
 
         	<div class="block-block text-center">
             <img
+              loading="lazy"
               @if($data->avatar == 'default.jpg')
-                src="{{asset('public/avatar').'/'.$data->avatar}}"
+                src="{{url('public/avatar').'default.jpg'}}"
+              @else
+                src="{{ App\Helper::imgixUrl('path.avatar', $data->avatar)}}"
               @endif
-              src="{{ App\Helper::getUrlFromS3('path.avatar', $data->avatar)}}"
               class="thumbnail img-responsive">
         	</div>
 

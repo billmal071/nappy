@@ -6,18 +6,23 @@
 
 @section('keywords_custom'){{$response->tags .','}}@endsection
 
+@php
+	// returns filename of a photo
+	// dd($response->preview);
+@endphp
+
 @section('css')
 <link href="{{ asset('public/plugins/iCheck/all.css') }}" rel="stylesheet" type="text/css" />
 <meta property="og:type" content="website" />
-<meta property="og:image:width" content="{{App\Helper::getWidth(App\Helper::getUrlFromS3('path.preview', $response->preview))}}"/>
-<meta property="og:image:height" content="{{App\Helper::getHeight(App\Helper::getUrlFromS3('path.preview', $response->preview))}}"/>
+<meta property="og:image:width" content="{{App\Helper::getWidth(App\Helper::imgixUrl('path.preview', $response->preview))}}"/>
+<meta property="og:image:height" content="{{App\Helper::getHeight(App\Helper::imgixUrl('path.preview', $response->preview))}}"/>
 <meta property="og:site_name" content="{{$settings->title}}"/>
 <meta property="og:url" content="{{url("photo/$response->id").'/'.str_slug($response->title)}}"/>
-<meta property="og:image" content="{{App\Helper::getUrlFromS3('path.preview', $response->preview)}}"/>
+<meta property="og:image" content="{{App\Helper::imgixUrl('path.preview', $response->preview)}}"/>
 <meta property="og:title" content="{{ $response->title.' - '.trans_choice('misc.photos_plural', 1 ).' #'.$response->id }}"/>
 <meta property="og:description" content="{{ App\Helper::removeLineBreak( e( $response->description ) ) }}"/>
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="{{App\Helper::getUrlFromS3('path.preview', $response->preview)}}" />
+<meta name="twitter:image" content="{{App\Helper::imgixUrl('path.preview', $response->preview)}}" />
 <meta name="twitter:title" content="{{ $response->title.' - '.trans_choice('misc.photos_plural', 1 ).' #'.$response->id }}" />
 <meta name="twitter:description" content="{{ App\Helper::removeLineBreak( e( $response->description ) ) }}"/>
 @endsection
@@ -80,10 +85,10 @@ $(document).on('click','.deleteComment',function () {
 	var $id = $(this).data('id');
 
 	$.ajaxSetup({
-				headers: {
-					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-					}
-			});
+		headers: {
+			'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+		}
+	});
 
 		swal(
 			{   title: "{{trans('misc.delete_confirm')}}",

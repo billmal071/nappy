@@ -34,7 +34,8 @@ class ImagesController extends Controller
         $this->request = $request;
     }
 
-    protected function validator(array $data, $id = null) {
+    protected function validator(array $data, $id = null)
+    {
 
         Validator::extend('ascii_only', function($attribute, $value, $parameters){
             return !preg_match('/[^x00-x7F\-]/i', $value);
@@ -89,13 +90,11 @@ class ImagesController extends Controller
    *
    * @return Response
    */
-     public function index()
-     {
-
+    public function index()
+    {
         $data = Images::all();
-
         return view('admin.images')->withData($data);
-     }
+    }
 
     /**
       * Store a newly created resource in storage.
@@ -436,8 +435,8 @@ class ImagesController extends Controller
    * @param  int  $id
    * @return Response
    */
-    public function show(Request $request, $id, $slug = null ) {
-
+    public function show(Request $request, $id, $slug = null )
+    {
         $response = Images::findOrFail($id);
 
         if( Auth::check() && $response->user_id != Auth::user()->id && $response->status == 'pending' && Auth::user()->role != 'admin' ) {
@@ -449,66 +448,62 @@ class ImagesController extends Controller
         $uri = $this->request->path();
 
         if( str_slug( $response->title ) == '' ) {
+            $slugUrl  = '';
+        } else {
+            $slugUrl  = '/'.str_slug( $response->title );
+        }
 
-                $slugUrl  = '';
-            } else {
-                $slugUrl  = '/'.str_slug( $response->title );
+        $url_image = 'photo/'.$response->id.$slugUrl;
+
+        //<<<-- * Redirect the user real page * -->>>
+        $uriImage     =  $this->request->path();
+        $uriCanonical = $url_image;
+
+        if( $uriImage != $uriCanonical ) {
+            return redirect($uriCanonical);
+        }
+
+        //<--------- * Visits * ---------->
+        $user_IP = request()->ip();
+        $date = time();
+
+        if( Auth::check() ) {
+            // SELECT IF YOU REGISTERED AND VISITED THE PUBLICATION
+            $visitCheckUser = $response->visits()->where('user_id',Auth::user()->id)->first();
+
+            if( !$visitCheckUser && Auth::user()->id != $response->user()->id ) {
+                $visit = new Visits;
+                $visit->images_id = $response->id;
+                $visit->user_id  = Auth::user()->id;
+                $visit->ip       = $user_IP;
+                $visit->save();
             }
-
-            $url_image = 'photo/'.$response->id.$slugUrl;
-
-            //<<<-- * Redirect the user real page * -->>>
-            $uriImage     =  $this->request->path();
-            $uriCanonical = $url_image;
-
-            if( $uriImage != $uriCanonical ) {
-                return redirect($uriCanonical);
-            }
-
-            //<--------- * Visits * ---------->
-            $user_IP = request()->ip();
-            $date = time();
-
-            if( Auth::check() ) {
-                // SELECT IF YOU REGISTERED AND VISITED THE PUBLICATION
-                $visitCheckUser = $response->visits()->where('user_id',Auth::user()->id)->first();
-
-                if( !$visitCheckUser && Auth::user()->id != $response->user()->id ) {
-                    $visit = new Visits;
-                    $visit->images_id = $response->id;
-                    $visit->user_id  = Auth::user()->id;
-                    $visit->ip       = $user_IP;
-                    $visit->save();
-                }
-
-            } else {
-
-                // IF YOU SELECT "UNREGISTERED" ALREADY VISITED THE PUBLICATION
-                $visitCheckGuest = $response->visits()->where('user_id',0)
-                ->where('ip',$user_IP)
-                ->orderBy('date','desc')
-                ->first();
+        } else {
+            // IF YOU SELECT "UNREGISTERED" ALREADY VISITED THE PUBLICATION
+            $visitCheckGuest = $response->visits()->where('user_id',0)
+            ->where('ip',$user_IP)
+            ->orderBy('date','desc')
+            ->first();
 
             if( $visitCheckGuest )  {
-                  $dateGuest = strtotime( $visitCheckGuest->date  ) + ( 7200 ); // 2 Hours
-
+                $dateGuest = strtotime( $visitCheckGuest->date  ) + ( 7200 ); // 2 Hours
             }
 
-                if( empty( $visitCheckGuest->ip )  ) {
-                    $visit = new Visits;
-                    $visit->images_id = $response->id;
-                    $visit->user_id  = 0;
-                    $visit->ip       = $user_IP;
-                    $visit->save();
-               } else if( $dateGuest < $date ) {
-                    $visit = new Visits;
-                    $visit->images_id = $response->id;
-                    $visit->user_id  = 0;
-                    $visit->ip       = $user_IP;
-                    $visit->save();
-               }
+            if( empty( $visitCheckGuest->ip )  ) {
+                $visit = new Visits;
+                $visit->images_id = $response->id;
+                $visit->user_id  = 0;
+                $visit->ip       = $user_IP;
+                $visit->save();
+            } else if( $dateGuest < $date ) {
+                $visit = new Visits;
+                $visit->images_id = $response->id;
+                $visit->user_id  = 0;
+                $visit->ip       = $user_IP;
+                $visit->save();
+            }
 
-            }//<--------- * Visits * ---------->
+        }//<--------- * Visits * ---------->
 
         if($request->ajax()) {
             return [
@@ -517,7 +512,6 @@ class ImagesController extends Controller
         }
 
         return view('images.show')->withResponse($response);
-
     }//<--- End Method
 
     /**
@@ -526,7 +520,8 @@ class ImagesController extends Controller
    * @param  int  $id
    * @return Response
    */
-    public function edit($id) {
+    public function edit($id)
+    {
 
         $data = Images::findOrFail($id);
 
@@ -544,38 +539,34 @@ class ImagesController extends Controller
    * @param  int  $id
    * @return Response
    */
-    public function update(Request $request) {
+    public function update(Request $request)
+    {
+        $image = Images::findOrFail($request->id);
 
-    $image = Images::findOrFail($request->id);
+        if( $image->user_id != Auth::user()->id ) {
+            return redirect('/');
+        }
 
-    if( $image->user_id != Auth::user()->id ) {
-        return redirect('/');
-    }
+        $input = $request->all();
 
-    $input = $request->all();
+        if($image->item_for_sale == 'sale' || $request->item_for_sale == 'sale') {
+            $input['item_for_sale'] = 'sale';
+        } else {
+            $input['item_for_sale'] = 'free';
+        }
 
-    if($image->item_for_sale == 'sale' || $request->item_for_sale == 'sale') {
-        $input['item_for_sale'] = 'sale';
-    } else {
-        $input['item_for_sale'] = 'free';
-    }
+        $validator = $this->validator($input, $request->id);
 
-         $validator = $this->validator($input, $request->id);
+        if ($validator->fails()) {
+            return redirect()->back()
+                    ->withErrors($validator)
+                    ->withInput();
+        }
 
-             if ($validator->fails()) {
-          return redirect()->back()
-                         ->withErrors($validator)
-                         ->withInput();
-                     }
-
-    $image->fill($input)->save();
-
-    \Session::flash('success_message', trans('admin.success_update'));
-
-    return redirect('edit/photo/'.$image->id);
-
+        $image->fill($input)->save();
+        \Session::flash('success_message', trans('admin.success_update'));
+        return redirect('edit/photo/'.$image->id);
     }//<--- End Method
-
 
     /**
    * Remove the specified resource from storage.
@@ -583,13 +574,12 @@ class ImagesController extends Controller
    * @param  int  $id
    * @return Response
    */
-    public function destroy(Request $request){
-
-      $image = Images::find($request->id);
-
-      if( $image->user_id != Auth::user()->id ) {
-        return redirect('/');
-    }
+    public function destroy(Request $request)
+    {
+        $image = Images::find($request->id);
+        if( $image->user_id != Auth::user()->id ) {
+            return redirect('/');
+        }
 
         // Delete Notification
         $notifications = Notifications::where('destination',$request->id)
@@ -607,8 +597,8 @@ class ImagesController extends Controller
         }
 
         // Collections Images
-    $collectionsImages = CollectionsImages::where('images_id', '=', $request->id)->get();
-     if( isset( $collectionsImages ) ){
+        $collectionsImages = CollectionsImages::where('images_id', '=', $request->id)->get();
+        if( isset( $collectionsImages ) ){
             foreach($collectionsImages as $collectionsImage){
                 $collectionsImage->delete();
             }
@@ -616,26 +606,23 @@ class ImagesController extends Controller
 
         // Images Reported
         $imagesReporteds = ImagesReported::where('image_id', '=', $request->id)->get();
-         if( isset( $imagesReporteds ) ){
-                foreach($imagesReporteds as $imagesReported){
-                    $imagesReported->delete();
-                }
+        if( isset( $imagesReporteds ) ){
+            foreach($imagesReporteds as $imagesReported){
+                $imagesReported->delete();
             }
+        }
 
         //<---- ALL RESOLUTIONS IMAGES
         $stocks = Stock::where('images_id', '=', $request->id)->get();
 
         foreach($stocks as $stock){
-
             $stock_path = 'public/uploads/'.$stock->type.'/'.$stock->name;
 
             // Delete Stock
             if ( \File::exists($stock_path) ) {
                 \File::delete($stock_path);
             }//<--- IF FILE EXISTS
-
             $stock->delete();
-
         }//<--- End foreach
 
         $preview_image = 'public/uploads/preview/'.$image->preview;
@@ -653,11 +640,12 @@ class ImagesController extends Controller
 
         $image->delete();
 
-      return redirect(Auth::user()->username);
+        return redirect(Auth::user()->username);
 
     }//<--- End Method
 
-    public function download(Request $request, $token_id, $type) {
+    public function download(Request $request, $token_id, $type)
+    {
 
         $image = Images::where('token_id',$token_id)->where('item_for_sale', 'free')->firstOrFail();
 
@@ -714,7 +702,8 @@ class ImagesController extends Controller
             }//<--------- * Visits * ---------->
             //<<<<---/ Download Check User
 
-            $pathFile = 'public/uploads/'.$type.'/'.$getImage->name;
+            // $pathFile = 'public/uploads/'.$type.'/'.$getImage->name;
+            $pathFile = Storage::disk('s3')->url(config('path.uploads').$type.'/'.$getImage->name);
 
             if($request->ajax()) {
                 return [
@@ -735,7 +724,8 @@ class ImagesController extends Controller
         }
     }//<--- End Method
 
-    public function report(Request $request){
+    public function report(Request $request)
+    {
 
         $data = ImagesReported::firstOrNew(['user_id' => Auth::user()->id, 'image_id' => $request->id]);
 
@@ -752,7 +742,8 @@ class ImagesController extends Controller
 
     }//<--- End Method
 
-    public function purchase(Request $request, $token_id, $type) {
+    public function purchase(Request $request, $token_id, $type)
+    {
 
         $image = Images::where('token_id', $token_id)->firstOrFail();
 
@@ -843,6 +834,4 @@ class ImagesController extends Controller
         }// $getImage
 
     }//<--- End Method
-
-
 }

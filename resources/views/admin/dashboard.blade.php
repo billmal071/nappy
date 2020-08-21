@@ -162,10 +162,12 @@
 		                      <div class="product-img">
 		                        {{-- <img src="{{ asset('public/avatar').'/'.$user->avatar }}" style="height: auto !important;" /> --}}
                             <img
+                              loading="lazy"
                               @if ($user->avatar == 'default.jpg')
-                                src="{{ asset('public/avatar').'/'.$user->avatar }}"
+                                src="{{ url('public/avatar').'default.jpg' }}"
+                              @else
+                                src="{{ App\Helper::imgixUrl('path.avatar', $user->avatar) }}"
                               @endif
-                              src="{{ App\Helper::getUrlFromS3('path.avatar', $user->avatar) }}"
                               style="height: auto !important;" />
 		                      </div>
 		                      <div class="product-info">

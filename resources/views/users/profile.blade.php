@@ -79,7 +79,12 @@ if( Auth::check() ) {
         <a href="{{ url($user->username) }}">
             {{-- <img src="{{ asset('public/avatar').'/'.$user->avatar }}" width="150" height="150" class="img-circle border-avatar-profile avatarUser" /> --}}
             <img
-                src="{{ App\Helper::getUrlFromS3('path.avatar', $user->avatar) }}"
+                loading="lazy"
+                @if($user->avatar == 'default.jpg')
+                    src={{ url('public/avatar', 'default.jpg') }}
+                @else
+                    src="{{ App\Helper::imgixUrl('path.avatar', $user->avatar) }}"
+                @endif
                 width="150"
                 height="150"
                 class="img-circle border-avatar-profile avatarUser" />
@@ -88,7 +93,7 @@ if( Auth::check() ) {
         <h1 class="title-item none-overflow font-default">
             @if( $user->name != '' )
 
-            <span> {{ e( $user->name ) }} </span></br>
+            <span> {{ e( $user->name ) }} </span><br>
                 <small class="text-muted">{{ '@'.$user->username }}</small>
 
             @else

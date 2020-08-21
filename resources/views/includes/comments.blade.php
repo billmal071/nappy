@@ -3,7 +3,16 @@
 	      <div class="media media-comments position-relative" id="comment{{$comment->id}}">
 			<span class="pull-left">
 				<a href="{{url($comment->user()->username)}}">
-				<img width="50" height="50" class="media-object img-circle" src="{{url('public/avatar/',$comment->user()->avatar)}}">
+				<img
+					loading="lazy"
+					@if($comment->user()->avatar == 'default.jpg')
+						src={{ url('public/avatar', 'default.jpg') }}
+					@else
+						src="{{ App\Helper::imgixUrl('path.avatar', $comment->user()->avatar) }}"
+					@endif
+					width="50"
+					height="50"
+					class="media-object img-circle">
 			</a>
 			</span>
 			<div class="media-body media-body-comments">

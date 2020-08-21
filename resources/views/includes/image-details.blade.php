@@ -1,6 +1,5 @@
 <?php
     if ( Auth::check() ) {
-
         // FOLLOW ACTIVE
         $followActive = App\Models\Followers::where( 'follower', Auth::user()->id )
         ->where('following',$response->user()->id)
@@ -52,10 +51,10 @@
                 $query->orWhere('tags', 'LIKE', '%'.$arrayTags[$k].'%');
             }
         })
-    ->where('id', '<>',$response->id)
-    ->orderByRaw('RAND()')
-    //->take(5)
-    ->get();
+        ->where('id', '<>',$response->id)
+        ->orderByRaw('RAND()')
+        //->take(5)
+        ->get();
 
     // $sponImages = App\Models\Images::where('sponsored', 'yes')->get();
     // Sponsored Photos
@@ -63,106 +62,115 @@
 ?>
 
 @if (Route::currentRouteName() != 'photo-details')
-<meta property="og:type" content="website" />
-<meta property="og:image:width" content="{{App\Helper::getWidth(App\Helper::getUrlFromS3('path.preview', $response->preview))}}"/>
-<meta property="og:image:height" content="{{App\Helper::getHeight(App\Helper::getUrlFromS3('path.preview', $response->preview))}}"/>
-<meta property="og:site_name" content="{{$settings->title}}"/>
-<meta property="og:url" content="{{url("photo/$response->id").'/'.str_slug($response->title)}}"/>
-<meta property="og:image" content="{{App\Helper::getUrlFromS3('path.preview', $response->preview)}}"/>
-<meta property="og:title" content="{{ $response->title.' - '.trans_choice('misc.photos_plural', 1 ).' #'.$response->id }}"/>
-<meta property="og:description" content="{{ App\Helper::removeLineBreak( e( $response->description ) ) }}"/>
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="{{App\Helper::getUrlFromS3('path.preview', $response->preview)}}" />
-<meta name="twitter:title" content="{{ $response->title.' - '.trans_choice('misc.photos_plural', 1 ).' #'.$response->id }}" />
-<meta name="twitter:description" content="{{ App\Helper::removeLineBreak( e( $response->description ) ) }}"/>
+    <meta property="og:type" content="website" />
+    <meta property="og:image:width" content="{{App\Helper::getWidth(App\Helper::imgixUrl('path.preview', $response->preview))}}"/>
+    <meta property="og:image:height" content="{{App\Helper::getHeight(App\Helper::imgixUrl('path.preview', $response->preview))}}"/>
+    <meta property="og:site_name" content="{{$settings->title}}"/>
+    <meta property="og:url" content="{{url("photo/$response->id").'/'.str_slug($response->title)}}"/>
+    <meta property="og:image" content="{{App\Helper::imgixUrl('path.preview', $response->preview)}}"/>
+    <meta property="og:title" content="{{ $response->title.' - '.trans_choice('misc.photos_plural', 1 ).' #'.$response->id }}"/>
+    <meta property="og:description" content="{{ App\Helper::removeLineBreak( e( $response->description ) ) }}"/>
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="{{App\Helper::imgixUrl('path.preview', $response->preview)}}" />
+    <meta name="twitter:title" content="{{ $response->title.' - '.trans_choice('misc.photos_plural', 1 ).' #'.$response->id }}" />
+    <meta name="twitter:description" content="{{ App\Helper::removeLineBreak( e( $response->description ) ) }}"/>
 @endif
 
+<div id="test">
 @if( Auth::check() )
-<div class="modal fade" id="collections" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button id="collection-md-close" type="button" class="close">&times;</button>
-                <h4 class="modal-title text-center" id="myModalLabel">
-                    <strong>{{ trans('misc.add_collection') }}</strong>
-                </h4>
-             </div><!-- Modal header -->
+    <div class="modal fade" id="collections" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button id="collection-md-close" type="button" class="close">&times;</button>
+                    <h4 class="modal-title text-center" id="myModalLabel">
+                        <strong>{{ trans('misc.add_collection') }}</strong>
+                    </h4>
+                </div><!-- Modal header -->
 
-             <div class="modal-body listWrap">
+                <div class="modal-body listWrap">
+                    <div class="collectionsData">
+                        @if( $collections->count() != 0 )
+                            @foreach ( $collections as $collection )
+                                @php
+                                    $collectionImages = $collection->collection_images
+                                                            ->where('images_id',$response->id)
+                                                            ->where('collections_id',$collection->id)
+                                                            ->first();
 
-                <div class="collectionsData">
-                    @if( $collections->count() != 0 )
-                        @foreach ( $collections as $collection )
+                                    if( !empty( $collectionImages ) ) {
+                                        $checked = 'checked="checked"';
+                                    } else {
+                                        $checked = null;
+                                    }
+                                @endphp
+                                <div class="radio margin-bottom-15">
+                                    <label
+                                        class="checkbox-inline padding-zero addImageCollection text-overflow" 
+                                        data-image-id="{{$response->id}}"
+                                        data-collection-id="{{$collection->id}}">
+                                        <input
+                                            class="no-show"
+                                            name="checked"
+                                            {{$checked}}
+                                            type="checkbox"
+                                            value="true">
+                                        <span class="input-sm">
+                                            {{$collection->title}}
+                                        </span>
+                                    </label>
+                                </div>
+                            @endforeach
+                        @else
+                            <div class="btn-block text-center no-collections">{{ trans('misc.no_have_collections') }}</div>
+                        @endif
+                    </div><!-- collection data -->
 
-                            <?php
+                    <small class="btn-block note-add @if( $collections->count() == 0 ) display-none @endif">* {{ trans('misc.note_add_collections') }}</small>
 
-                                $collectionImages = $collection->collection_images->where('images_id',$response->id)->where('collections_id',$collection->id)->first();
+                    <span class="label label-success display-none btn-block response-text"></span>
 
-                                if( !empty( $collectionImages ) ) {
-                                    $checked = 'checked="checked"';
-                                } else {
-                                    $checked = null;
-                                }
-                            ?>
-                            <div class="radio margin-bottom-15">
-                                <label class="checkbox-inline padding-zero addImageCollection text-overflow" data-image-id="{{$response->id}}" data-collection-id="{{$collection->id}}">
-                                <input class="no-show" name="checked" {{$checked}} type="checkbox" value="true">
-                                <span class="input-sm">{{$collection->title}}</span>
+                    <!-- form start -->
+                    <form method="POST" action="" enctype="multipart/form-data" id="addCollectionForm">
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="image_id" value="{{ $response->id }}">
+
+                        <!-- Start Form Group -->
+                        <div class="form-group">
+                        <label>{{ trans('admin.title') }}</label>
+                            <input type="text" value="" name="title" id="titleCollection" class="form-control" placeholder="{{ trans('admin.title') }}">
+                        </div><!-- /.form-group-->
+
+                        <!-- Start form-group -->
+                        <div class="form-group">
+
+                            <div class="radio">
+                                <label class="padding-zero">
+                                    <input type="radio" name="type" checked="checked" value="public">
+                                    {{ trans('misc.public') }}
                                 </label>
                             </div>
 
-                        @endforeach
-                    @else
-                        <div class="btn-block text-center no-collections">{{ trans('misc.no_have_collections') }}</div>
-                    @endif
-                </div><!-- collection data -->
-
-                <small class="btn-block note-add @if( $collections->count() == 0 ) display-none @endif">* {{ trans('misc.note_add_collections') }}</small>
-
-                <span class="label label-success display-none btn-block response-text"></span>
-
-                <!-- form start -->
-                <form method="POST" action="" enctype="multipart/form-data" id="addCollectionForm">
-                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                    <input type="hidden" name="image_id" value="{{ $response->id }}">
-
-                 <!-- Start Form Group -->
-                    <div class="form-group">
-                      <label>{{ trans('admin.title') }}</label>
-                        <input type="text" value="" name="title" id="titleCollection" class="form-control" placeholder="{{ trans('admin.title') }}">
-                    </div><!-- /.form-group-->
-
-                    <!-- Start form-group -->
-                    <div class="form-group">
-
                         <div class="radio">
                             <label class="padding-zero">
-                                <input type="radio" name="type" checked="checked" value="public">
-                                {{ trans('misc.public') }}
+                                <input type="radio" name="type" value="private">
+                                {{ trans('misc.private') }}
                             </label>
                         </div>
 
-                      <div class="radio">
-                        <label class="padding-zero">
-                            <input type="radio" name="type" value="private">
-                            {{ trans('misc.private') }}
-                        </label>
-                      </div>
+                        </div><!-- /.form-group -->
 
-                    </div><!-- /.form-group -->
+                        <!-- Alert -->
+                        <div class="alert alert-danger alert-small display-none" id="dangerAlert">
+                            <ul class="list-unstyled" id="showErrors"></ul>
+                        </div><!-- Alert -->
 
-                    <!-- Alert -->
-                    <div class="alert alert-danger alert-small display-none" id="dangerAlert">
-                        <ul class="list-unstyled" id="showErrors"></ul>
-                    </div><!-- Alert -->
+                        <div class="btn-block text-center">
+                            <button type="submit" class="btn btn-sm btn-success" id="addCollection">{{ trans('misc.create_collection') }} <i class="fa fa-plus"></i></button>
+                        </div>
 
-                    <div class="btn-block text-center">
-                        <button type="submit" class="btn btn-sm btn-success" id="addCollection">{{ trans('misc.create_collection') }} <i class="fa fa-plus"></i></button>
-                    </div>
-
-                </form>
-
-              </div><!-- Modal body -->
+                    </form>
+                </div><!-- Modal body -->
             </div><!-- Modal content -->
         </div><!-- Modal dialog -->
     </div><!-- Modal -->
@@ -176,10 +184,12 @@
                     <span>
                         {{-- <img src="{{ url('public/avatar/',$response->user()->avatar) }}" alt="User" class="img-circle profile-btn profile-img" data-user="{{$response->user()->username}}"> --}}
                         <img
+                            loading="lazy"
                             @if($response->user()->avatar == 'default.jpg')
                                 src={{ url('public/avatar', 'default.jpg') }}
+                            @else
+                                src="{{ App\Helper::imgixUrl('path.avatar', $response->user()->avatar) }}"
                             @endif
-                            src="{{ App\Helper::getUrlFromS3('path.avatar', $response->user()->avatar) }}"
                             alt="User"
                             class="img-circle profile-btn profile-img"
                             data-user="{{$response->user()->username}}">
@@ -253,40 +263,49 @@
 
                     <ul class="dropdown-menu arrowDownload dd-close btn-block">
                         @foreach( $stockImages as $stock )
-                        <?php
-                            switch( $stock->type ) {
-                            case 'small':
-                                $_size          = trans('misc.s');
-                                break;
-                            case 'medium':
-                                $_size          = trans('misc.m');
-                                break;
-                            case 'large':
-                                $_size          = trans('misc.l');
-                                break;
-                            }
-                        ?>
-                        <li>
-                            {{--<a href="{{url('download',$stock->token)}}/{{$stock->type}}">
-                                <span class="label label-default myicon-right">{{$_size}}</span> {{$stock->resolution}} 
-                                <span class="pull-right">{{$stock->size}}</span>
-                            </a> --}}
-			    {{-- @if (Auth::check()) --}}
-                    	    @if ($response->item_for_sale == 'free')
-                                <button onclick="downloadAjax(this);" data-img-url="{{url('download',$stock->token)}}/{{$stock->type}}" data-img-id="{{$response->id}}">
-                                    <span class="label label-default myicon-right">{{$_size}}</span> {{$stock->resolution}} &nbsp;
+                            @php
+                                switch( $stock->type ) {
+                                    case 'small':
+                                        $_size = trans('misc.s');
+                                        break;
+                                    case 'medium':
+                                        $_size = trans('misc.m');
+                                        break;
+                                    case 'large':
+                                        $_size = trans('misc.l');
+                                        break;
+                                }
+                            @endphp
+                            <li>
+                                {{--
+                                <a href="{{url('download',$stock->token)}}/{{$stock->type}}">
+                                    <span class="label label-default myicon-right">
+                                        {{$_size}}
+                                    </span>
+                                    {{$stock->resolution}} 
                                     <span class="pull-right">{{$stock->size}}</span>
-                                </button>
-                            @else
-                                <button onclick="downloadToLogin();">
-                                    <span class="label label-default myicon-right">{{$_size}}</span> {{$stock->resolution}} 
-                                    <span class="pull-right">{{$stock->size}}</span>
-                                </button>
-                            @endif
-                            
-                        </li>
+                                </a>
+                                --}}
+                                {{-- @if (Auth::check()) --}}
+                                @if ($response->item_for_sale == 'free')
+                                    <button onclick="downloadAjax(this);" data-img-url="{{url('download',$stock->token)}}/{{$stock->type}}" data-img-id="{{$response->id}}">
+                                        <span class="label label-default myicon-right">{{$_size}}</span> {{$stock->resolution}} &nbsp;
+                                        <span class="pull-right">{{$stock->size}}</span>
+                                    </button>
+                                @else
+                                    <button onclick="downloadToLogin();">
+                                        <span class="label label-default myicon-right">
+                                            {{$_size}}
+                                        </span>
+                                        {{$stock->resolution}} 
+                                        <span class="pull-right">
+                                            {{$stock->size}}
+                                        </span>
+                                    </button>
+                                @endif
+                            </li>
                         @endforeach
-                      </ul>
+                    </ul>
                     <!-- btn-free -->
                     @else
                         <!-- btn-sale -->
@@ -349,9 +368,12 @@
 <div class="row">
     <div class="col-lg-12 col-xs-12 stock-div">
         @if (isset($response))
-            <img src="{{App\Helper::getUrlFromS3('path.medium', $stockImages{1}->name)}}" class="img-fluid mx-auto stock-img" alt="Responsive image">
+            <img
+                loading="lazy"
+                src="{{App\Helper::imgixUrl('path.medium', $stockImages{1}->name)}}"
+                class="img-fluid mx-auto stock-img"
+                alt="Responsive image">
         @endif
-        
     </div>
 </div>
 
@@ -408,7 +430,6 @@
     </div>
 </div>
 
-
 @if( Auth::check() &&  isset($response->user()->id) && Auth::user()->id == $response->user()->id )
     <div class="row">
         <div class="row margin-bottom-20">
@@ -422,17 +443,16 @@
     </div>
 @endif
 
-
- @if( Auth::check() && $response->user()->id != Auth::user()->id && $response->user()->paypal_account != '' || Auth::guest()  && $response->user()->paypal_account != '' )
- <form id="form_pp" name="_xclick" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-    <input type="hidden" name="cmd" value="_donations">
-    <input type="hidden" name="return" value="{{url('photo',$response->id)}}">
-    <input type="hidden" name="cancel_return"   value="{{url('photo',$response->id)}}">
-    <input type="hidden" name="currency_code" value="USD">
-    <input type="hidden" name="item_name" value="{{trans('misc.support').' @'.$response->user()->username}} - {{$settings->title}}" >
-    <input type="hidden" name="business" value="{{$response->user()->paypal_account}}">
-    <input type="submit">
-</form>
+@if( Auth::check() && $response->user()->id != Auth::user()->id && $response->user()->paypal_account != '' || Auth::guest()  && $response->user()->paypal_account != '' )
+    <form id="form_pp" name="_xclick" action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+        <input type="hidden" name="cmd" value="_donations">
+        <input type="hidden" name="return" value="{{url('photo',$response->id)}}">
+        <input type="hidden" name="cancel_return"   value="{{url('photo',$response->id)}}">
+        <input type="hidden" name="currency_code" value="USD">
+        <input type="hidden" name="item_name" value="{{trans('misc.support').' @'.$response->user()->username}} - {{$settings->title}}" >
+        <input type="hidden" name="business" value="{{$response->user()->paypal_account}}">
+        <input type="submit">
+    </form>
 @endif
 
 <script type="text/javascript">
@@ -538,3 +558,4 @@
         }, 100);
     }
 </script>
+</div> {{-- #test --}}

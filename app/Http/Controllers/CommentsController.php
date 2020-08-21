@@ -89,7 +89,7 @@ class CommentsController extends Controller {
 	      <div class="media media-comments position-relative" data-id="'.$idComment.'">
 			<span class="pull-left">
 				<a href="'.url(Auth::user()->username).'">
-				<img width="50" height="50" class="media-object img-circle" src="'.url("public/avatar/",Auth::user()->avatar).'">
+				<img width="50" height="50" class="media-object img-circle" src="'.App\Helper::imgixUrl('path.avatar/', Auth::user()->avatar).'">
 			</a>
 			</span>
 			<div class="media-body media-body-comments">
@@ -188,9 +188,7 @@ class CommentsController extends Controller {
 				}
 
 				foreach ($data as $key) {
-					$_array[] = '<li><a href="'.url($key->user()->username).'" class="showTooltip" data-toggle="tooltip" data-placement="left" title="'.$key->user()->username.'">
-					<img src="'.asset('public/avatar').'/'.$key->user()->avatar.'" class="img-circle" width="25">
-					</a></li>';
+					$_array[] = '<li><a href="'.url($key->user()->username).'" class="showTooltip" data-toggle="tooltip" data-placement="left" title="'.$key->user()->username.'"><img src="'.App\Helper::imgixUrl('path.avatar', $key->user()->avatar).'" class="img-circle" width="25"></a></li>';
 				}
 				return $_array;
 

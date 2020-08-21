@@ -85,12 +85,12 @@ class AdminController extends Controller {
                 if(  $image->width() == 457 && $image->height() == 359 ) {
                     Storage::disk('s3')->put($path.$thumbnail, $temp.$thumbnail, 'public');
                     // \File::copy($temp.$thumbnail, $path.$thumbnail);
-                    // \File::delete($temp.$thumbnail);
+                    \File::delete($temp.$thumbnail);
                 } else {
                     $image->fit(457, 359)->save($temp.$thumbnail);
                     Storage::disk('s3')->put($path.$thumbnail, $temp.$thumbnail, 'public');
                     // \File::copy($temp.$thumbnail, $path.$thumbnail);
-                    // \File::delete($temp.$thumbnail);
+                    \File::delete($temp.$thumbnail);
                 }
             }// End File
         } else {
@@ -153,12 +153,12 @@ class AdminController extends Controller {
                 if(  $image->width() == 457 && $image->height() == 359 ) {
                     Storage::disk('s3')->put($path.$thumbnail, $temp.$thumbnail, 'public');
                     // \File::copy($temp.$thumbnail, $path.$thumbnail);
-                    // \File::delete($temp.$thumbnail);
+                    \File::delete($temp.$thumbnail);
                 } else {
                     $image->fit(457, 359)->save($temp.$thumbnail);
                     Storage::disk('s3')->put($path.$thumbnail, $temp.$thumbnail, 'public');
                     // \File::copy($temp.$thumbnail, $path.$thumbnail);
-                    // \File::delete($temp.$thumbnail);
+                    \File::delete($temp.$thumbnail);
                 }
 
                 // Delete Old Image

@@ -75,7 +75,19 @@ $user = Auth::user();
 				<!-- Start -->
 				<div class="media li-group noty-media">
 					<div class="pull-left">
-						<a href="{{ url('/') }}/{{ $key->username }}"> <img width="40" height="40" class="img-circle myicon-righ media-objectt" alt="User" src="{{ asset('public/avatar').'/'.$key->avatar }}"> </a>
+						<a href="{{ url('/') }}/{{ $key->username }}">
+							<img
+								loading="lazy"
+								@if($key->avatar == 'default.jpg')
+									src={{ url('public/avatar', 'default.jpg') }}
+								@else
+									src="{{ App\Helper::imgixUrl('path.avatar', $key->avatar) }}"
+								@endif
+								width="40"
+								height="40"
+								class="img-circle myicon-righ media-objectt"
+								alt="User">
+						</a>
 					</div>
 					<div class="media-body">
 						<div class="pull-right small">

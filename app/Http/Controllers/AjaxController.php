@@ -22,51 +22,48 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Image;
 
-class AjaxController extends Controller {
-
-	public function __construct( AdminSettings $settings) {
+class AjaxController extends Controller
+{
+	public function __construct( AdminSettings $settings)
+	{
 		$this->settings = $settings::first();
 	}
 
-	public function like( Request $request ){
-
+	public function like( Request $request )
+	{
 		$like = Like::firstOrNew(['user_id' => Auth::user()->id, 'images_id' => $request->id]);
-
 		$user = Images::find($request->id);
 
 		if( $like->exists ) {
 
-			   $notifications = Notifications::where('destination',$user->user_id)
-			   ->where('author',Auth::user()->id)
-			   ->where('target',$request->id)
-			   ->where('type','2')
-			   ->first();
+			$notifications = Notifications::where('destination',$user->user_id)
+			->where('author',Auth::user()->id)
+			->where('target',$request->id)
+			->where('type','2')
+			->first();
 
-				// IF ACTIVE DELETE FOLLOW
-				if( $like->status == '1' ) {
-					$like->status = '0';
-					$like->update();
+			// IF ACTIVE DELETE FOLLOW
+			if( $like->status == '1' ) {
+				$like->status = '0';
+				$like->update();
 
 				if( isset( $notifications ) ) {
 					// DELETE NOTIFICATION
 					$notifications->status = '1';
 					$notifications->update();
 				}
+			// ELSE ACTIVE AGAIN
+			} else {
+				$like->status = '1';
+				$like->update();
 
-				// ELSE ACTIVE AGAIN
-				} else {
-					$like->status = '1';
-					$like->update();
-
-					if( isset( $notifications ) ) {
-					// ACTIVE NOTIFICATION
-					$notifications->status = '0';
-					$notifications->update();
-					}
+				if( isset( $notifications ) ) {
+				// ACTIVE NOTIFICATION
+				$notifications->status = '0';
+				$notifications->update();
 				}
-
+			}
 		} else {
-
 			// INSERT
 			$like->save();
 
@@ -74,15 +71,13 @@ class AjaxController extends Controller {
 			if( $user->user_id != Auth::user()->id ) {
 				Notifications::send( $user->user_id, Auth::user()->id, '2', $request->id );
 			}
-
 		}
-
-				$totalLike = Helper::formatNumber( $user->likes()->count() );
-
-				return $totalLike;
+		$totalLike = Helper::formatNumber( $user->likes()->count() );
+		return $totalLike;
 	}//<---- End Method
 
-	public function follow( Request $request ){
+	public function follow( Request $request )
+	{
 
 		 $user = Followers::firstOrNew(['follower' => Auth::user()->id, 'following' => $request->id]);
 
@@ -118,7 +113,6 @@ class AjaxController extends Controller {
 				}
 
 		} else {
-
 			// INSERT
 			$user->save();
 
@@ -126,46 +120,43 @@ class AjaxController extends Controller {
 			if( $request->id != Auth::user()->id ) {
 				Notifications::send( $request->id, Auth::user()->id, '1', Auth::user()->id );
 			}
-
 		}
-			return response()->json([
-				        'status' => true,
-				    ]);
+		return response()->json([
+			'status' => true,
+		]);
 	}//<---- End Method
 
-	public function notifications() {
-
+	public function notifications()
+	{
 		if( Auth::check() ) {
-
 		   if(request()->ajax()) {
-			// Notifications
-			$notifications_count = Notifications::where('destination',Auth::user()->id)->where('status','0')->count();
+				// Notifications
+				$notifications_count = Notifications::where('destination',Auth::user()->id)
+										->where('status','0')
+										->count();
 
-			if( $notifications_count == 0 ){
-				$notifications_count = '0';
-			}
-
-			return response()->json( array ( 'notifications' => $notifications_count ) );
-
-		   } else {
+				if( $notifications_count == 0 ){
+					$notifications_count = '0';
+				}
+					return response()->json( array ( 'notifications' => $notifications_count ) );
+				} else {
 				return response()->json( array ( 'error' => 1 ) );
 			}
-	  }//Auth
-	  else {
-				return response()->json( array ( 'error' => 1 ) );
-			}
+		} else {
+			return response()->json( array ( 'error' => 1 ) );
+		}
 
-   }//<---- * End Method
+	}//<---- * End Method
 
-   public function users() {
-
-	 $data = Query::users();
-
-	 return view('ajax.users-ajax')->with($data)->render();
+	public function users()
+	{
+		$data = Query::users();
+		return view('ajax.users-ajax')->with($data)->render();
 
 	}//<---- End Method
 
-	public function search() {
+	public function search()
+	{
 
 	 $images = Query::searchImages();
 
@@ -173,7 +164,8 @@ class AjaxController extends Controller {
 
 	}//<---- End Method
 
-	public function latest() {
+	public function latest()
+	{
 
 	 $images = Query::latestImages();
 
@@ -181,7 +173,8 @@ class AjaxController extends Controller {
 
 	}//<---- End Method
 
-	public function featured() {
+	public function featured()
+	{
 
 	 $images = Query::featuredImages();
 
@@ -189,7 +182,8 @@ class AjaxController extends Controller {
 
 	}//<---- End Method
 
-	public function popular() {
+	public function popular()
+	{
 
 	 $images = Query::popularImages();
 
@@ -197,7 +191,8 @@ class AjaxController extends Controller {
 
 	}//<---- End Method
 
-	public function commented() {
+	public function commented()
+	{
 
 	 $images = Query::commentedImages();
 
@@ -205,15 +200,14 @@ class AjaxController extends Controller {
 
 	}//<---- End Method
 
-	public function viewed() {
-
-	 $images = Query::viewedImages();
-
-	 return view('ajax.images-ajax',['images' => $images])->render();
-
+	public function viewed()
+	{
+		$images = Query::viewedImages();
+		return view('ajax.images-ajax',['images' => $images])->render();
 	}//<---- End Method
 
-	public function downloads() {
+	public function downloads()
+	{
 
 	 $images = Query::downloadsImages();
 
@@ -221,7 +215,8 @@ class AjaxController extends Controller {
 
 	}//<---- End Method
 
-	public function category( Request $request ) {
+	public function category( Request $request )
+	{
 
 	 $slug = trim($request->slug);
 
@@ -231,7 +226,8 @@ class AjaxController extends Controller {
 
 	}//<---- End Method
 
-	public function tags( Request $request ) {
+	public function tags( Request $request )
+	{
 
 		 $slug = trim($request->q);
 
@@ -241,7 +237,8 @@ class AjaxController extends Controller {
 
 	}//<---- End Method
 
-	public function camera( Request $request ) {
+	public function camera( Request $request )
+	{
 
 		 $slug = trim($request->q);
 
@@ -251,7 +248,8 @@ class AjaxController extends Controller {
 
 	}//<---- End Method
 
-	public function colors( Request $request ) {
+	public function colors( Request $request )
+	{
 
 		 $slug = trim($request->q);
 
@@ -261,7 +259,8 @@ class AjaxController extends Controller {
 
 	}//<---- End Method
 
-	public function userImages( Request $request ) {
+	public function userImages( Request $request )
+	{
 
 		 $id = $request->id;
 
@@ -271,7 +270,8 @@ class AjaxController extends Controller {
 
 	}//<---- End Method
 
-	public function comments( Request $request ) {
+	public function comments( Request $request )
+	{
 
 		 $id = $request->photo;
 
@@ -281,12 +281,10 @@ class AjaxController extends Controller {
 
 	}//<---- End Method
 
-	public function premium() {
-
+	public function premium()
+	{
 	 $images = Query::premiumImages();
-
 	 return view('ajax.images-ajax',['images' => $images])->render();
-
 	}//<---- End Method
 
 }

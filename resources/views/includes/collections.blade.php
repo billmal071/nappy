@@ -19,7 +19,15 @@
 				</h5>
 			
 			<h5 class="text-overflow author-label mg-bottom-xs" title="{{$collection->user()->username}}">
-				<img src="{{ url('public/avatar',$collection->user()->avatar) }}" alt="User" class="img-circle profile-img"> 
+				<img
+					loading="lazy"
+					@if($collection->user()->avatar == 'default.jpg')
+						src={{ url('public/avatar', 'default.jpg') }}
+					@else
+						src="{{ App\Helper::imgixUrl('path.avatar', $collection->user()->avatar) }}"
+					@endif
+					alt="User"
+					class="img-circle profile-img"> 
 				<em>{{$collection->user()->username}}</em>
 				</h5>
 				<span class="timeAgo btn-block date-color text-overflow" data="{{ date('c', strtotime( $collection->created_at )) }}"></span>

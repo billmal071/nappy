@@ -241,18 +241,23 @@ class BulkUploadController extends Controller {
 
                 Storage::disk('s3')
                     ->put($path_preview.$preview, file_get_contents($temp.$preview), 'public');
+                \File::delete($temp.$preview);
 
                 Storage::disk('s3')
                     ->put($path_thumbnail.$thumbnail, file_get_contents($temp.$thumbnail), 'public');
+                \File::delete($temp.$thumbnail);
 
                 Storage::disk('s3')
                     ->put($path_small.$small, file_get_contents($temp.$small), 'public');
+                \File::delete($temp.$small);
 
                 Storage::disk('s3')
                     ->put($path_medium.$medium, file_get_contents($temp.$medium), 'public');
+                \File::delete($temp.$medium );
 
                 Storage::disk('s3')
                     ->put($path_large.$large, file_get_contents($temp.$large), 'public');
+                \File::delete($temp.$large);
 
                 // \File::copy($temp.$preview, $path_preview.$preview);
                 // \File::delete($temp.$preview);
