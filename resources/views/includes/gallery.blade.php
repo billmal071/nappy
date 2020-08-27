@@ -71,3 +71,36 @@
         @endif
     </h3>
 @endif
+{{-- 
+<script>
+    $(document).ready(function() {
+            // [WIP - masonry layout]
+            function resizeGridItem(item){
+                grid = document.getElementsByClassName("grid-gallery")[0];
+                rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
+                rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
+                rowSpan = Math.ceil((item.getBoundingClientRect().height+rowGap)/(rowHeight+rowGap));
+                item.style.gridRowEnd = "span "+rowSpan;
+            }
+
+            function resizeAllGridItems(){
+                allItems = document.getElementsByClassName("item");
+                for(x=0;x<allItems.length;x++){
+                resizeGridItem(allItems[x]);
+                }
+            }
+
+            function resizeInstance(instance){
+                item = instance.elements[0];
+                resizeGridItem(item);
+            }
+
+            window.onload = resizeAllGridItems();
+            window.addEventListener("resize", resizeAllGridItems);
+
+            allItems = document.getElementsByClassName("item");
+            for(x=0;x<allItems.length;x++){
+                imagesLoaded( allItems[x], resizeInstance);
+            }
+    });
+</script> --}}

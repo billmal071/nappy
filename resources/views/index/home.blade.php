@@ -65,9 +65,7 @@
     <script src="{{ asset('public/plugins/iCheck/icheck.min.js') }}"></script>
     <script src="{{ asset('public/js/custom/gallery.js') }}"></script>
     <script type="text/javascript">
-
         // $('#imagesFlex').flexImages({ rowHeight: 320, truncate: false });
-
         jQuery(document).ready(function( $ ) {
             $('.counter').counterUp({
                 delay: 10, // the delay time in ms

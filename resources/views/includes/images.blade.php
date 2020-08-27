@@ -45,17 +45,20 @@
             $thumbnail = App\Helper::imgixUrl('path.small', $stockImage->name);
         }
 
+
     @endphp
     <!-- Start Item -->
     {{-- @if(!empty($stockImages{0}->name) && App\Helper::getSize(Storage::disk('s3')->url(config('path.small').$stockImages{0}->name)) > 0) --}}
     @if(!empty($stockImages{0}->name))
+        <div class="content">
+            <div class="item">
         <a 
             id="{{ $image->id }}" 
             data-img-id="{{ $image->id }}"
             data-w="{{$newWidth}}"
             data-h="{{$newHeight}}"
-            style="display: block; margin: 1rem 0;"
-            class="item hovercard image-btn">
+            {{-- style="display: block;" --}}
+            class="hovercard image-btn">
             <!-- hover-content -->
             <span class="hover-content">
                 <span class="sub-hover">
@@ -96,6 +99,8 @@
             @endif
             
             <img
+                id="test-grid"
+                style="object-fit: cover;"
                 loading="lazy"
                 @if(!empty($stockImages{0}->name))
                     {{-- src="{{App\Helper::getUrlFromS3('path.small', $stockImages{0}->name)}}" --}}
@@ -105,6 +110,8 @@
                 @endif
                 class="previewImage"/>
         </a><!-- End Item -->
+        </div>
+        </div>
     @endif
 @endforeach
 @php

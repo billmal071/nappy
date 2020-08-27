@@ -166,33 +166,38 @@
             }
 
             // [WIP - masonry layout]
-            // function resizeGridItem(item){
-            //     grid = document.getElementsByClassName("grid-gallery")[0];
-            //     rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
-            //     rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
-            //     rowSpan = Math.ceil((item.getBoundingClientRect().height+rowGap)/(rowHeight+rowGap));
-            //     item.style.gridRowEnd = "span "+rowSpan;
-            // }
+            function resizeGridItem(item, num){
+                // let before = item.querySelector("#test-grid").complete;
+                let grid = document.getElementsByClassName("grid-gallery")[0];
+                let rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
+                let rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
+                let rowSpan = Math.ceil((item.querySelector(".item").getBoundingClientRect().height+rowGap)/(rowHeight+rowGap));
+                item.style.gridRowEnd = "span "+rowSpan;
+                let xheight = item.getBoundingClientRect().height;
+                // let after = item.querySelector("#test-grid").complete;
+                // console.log(`${num}, ${before},  ${after}`);
+                item.querySelector("#test-grid").style.height = xheight + "px";
+            }
 
-            // function resizeAllGridItems(){
-            //     allItems = document.getElementsByClassName("item");
-            //     for(x=0;x<allItems.length;x++){
-            //     resizeGridItem(allItems[x]);
-            //     }
-            // }
+            function resizeAllGridItems(){
+                let allItems = document.getElementsByClassName("content");
+                for(x=0;x<allItems.length;x++){
+                    resizeGridItem(allItems[x], x);
+                }
+            }
 
-            // function resizeInstance(instance){
-            //     item = instance.elements[0];
-            //     resizeGridItem(item);
-            // }
+            function resizeInstance(instance){
+                let item = instance.elements[0];
+                resizeGridItem(item);
+            }
 
             // window.onload = resizeAllGridItems();
             // window.addEventListener("resize", resizeAllGridItems);
 
-            // allItems = document.getElementsByClassName("item");
-            // for(x=0;x<allItems.length;x++){
-            //     imagesLoaded( allItems[x], resizeInstance);
-            // }
+            let allItems = document.getElementsByClassName("content");
+            for(x=0;x<allItems.length;x++){
+                imagesLoaded( allItems[x], resizeInstance);
+            }
         });
 
         var goHistoryCount = 0;
