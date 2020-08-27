@@ -88,12 +88,12 @@ class HomeController extends Controller
     public function getSearch()
     {
 
-        $q = request()->get('q');
+        // $q = request()->get('q');
         $images = Query::searchImages();
         //<--- * If $q is empty or is minus to 1 * ---->
-        if( $q == '' || strlen( $q ) <= 2 ){
-            return redirect('/');
-        }
+        // if( $q == '' || strlen( $q ) <= 2 ){
+        //     return redirect('/');
+        // }
         return view('default.search')->with($images);
     }// End Method
 

@@ -84,8 +84,14 @@ class LoginController extends Controller
 
             if( isset( $urlReturn ) && url()->isValidUrl($urlReturn) ) {
                 return redirect($urlReturn);
+                // return response()->json([
+                //     'resp' => $urlReturn
+                // ]);
               } else {
                 return redirect()->intended('/');
+                // return response()->json([
+                //     'resp' => url()->current()
+                // ]);
               }
 
 

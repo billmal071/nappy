@@ -186,7 +186,7 @@
             <img
               loading="lazy"
               @if($data->avatar == 'default.jpg')
-                src="{{url('public/avatar').'default.jpg'}}"
+                src="{{ url('public/avatar').'default.jpg'}}"
               @else
                 src="{{ App\Helper::imgixUrl('path.avatar', $data->avatar)}}"
               @endif

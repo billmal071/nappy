@@ -164,7 +164,7 @@
                             <img
                               loading="lazy"
                               @if ($user->avatar == 'default.jpg')
-                                src="{{ url('public/avatar').'default.jpg' }}"
+                                src="{{ url('public/avatar').'/default.jpg' }}"
                               @else
                                 src="{{ App\Helper::imgixUrl('path.avatar', $user->avatar) }}"
                               @endif
@@ -233,7 +233,7 @@
                       <div class="product-img">
                         {{-- <img src="{{ asset('public/uploads/thumbnail/').'/'.$image->thumbnail }}" style="height: auto !important;" /> --}}
                         <img
-                          src="{{ App\Helper::getUrlFromS3('path.thumbnail', $image->thumbnail) }}"
+                          src="{{ App\Helper::imgixUrl('path.thumbnail', $image->thumbnail) }}"
                           style="height: auto !important;" />
                       </div>
                       <div class="product-info">

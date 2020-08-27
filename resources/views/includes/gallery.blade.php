@@ -41,8 +41,8 @@
 
 @if( $images->total() != 0 )
     <div
-        id="imagesFlex"
-        class="endless-pagination flex-images btn-block margin-bottom-40"
+        id="imagesGrid"
+        class="endless-pagination flex-images grid-gallery btn-block margin-bottom-40"
         data-next-page="{{ $images->nextPageUrl() }}">
         @include('includes.images')
     </div><!-- Image Flex -->

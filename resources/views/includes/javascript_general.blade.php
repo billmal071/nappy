@@ -13,5 +13,7 @@
     <script src="{{ asset('public/js/jquery.form.js') }}"></script>
     <script src="{{ asset('public/plugins/sweetalert/sweetalert.min.js') }}"></script>
     <script src="{{ asset('public/plugins/fleximages/jquery.flex-images.min.js') }}"></script>
+    <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.js"></script>
+    <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
 
     <script src="{{ asset('public/js/cookies.js') }}"></script>

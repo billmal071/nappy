@@ -4,6 +4,9 @@
 
 @stop
 
+@php
+@endphp
+
 @section('content')
     <div class="jumbotron index-header jumbotron_set jumbotron-cover @if( Auth::check() ) session-active-cover @endif">
         <div class="container wrap-jumbotron position-relative">
@@ -45,7 +48,7 @@
 
     <div class="container-fluid margin-bottom-40">
         <div id="gallery-div" class="row margin-bottom-20 gallery-container">
-            <div class="col-md-12 btn-block margin-bottom-zero text-center">
+            <div style="margin-bottom: 1rem;" class="col-md-12 btn-block text-center">
                 <button type="button" class="btn btn-link gallery-btn @if ($selected == 'latest') underscored @endif" data-type="latest">Latest</button>
                 <button type="button" class="btn btn-link gallery-btn @if ($selected == 'popular') underscored @endif" data-type="popular">Popular</button>
                 <button type="button" class="btn btn-link gallery-btn @if ($selected == 'featured') underscored @endif" data-type="featured">Featured</button>
@@ -63,12 +66,12 @@
     <script src="{{ asset('public/js/custom/gallery.js') }}"></script>
     <script type="text/javascript">
 
-        $('#imagesFlex').flexImages({ rowHeight: 320, truncate: false });
+        // $('#imagesFlex').flexImages({ rowHeight: 320, truncate: false });
 
         jQuery(document).ready(function( $ ) {
             $('.counter').counterUp({
-            delay: 10, // the delay time in ms
-            time: 1000 // the speed time in ms
+                delay: 10, // the delay time in ms
+                time: 1000 // the speed time in ms
             });
         });
 
@@ -110,14 +113,14 @@
                 }
 
                 $.get(galleryUrl, function(data){
-                    $('#imagesFlex').children().remove();
+                    $('#imagesGrid').children().remove();
                     $('.blank-gallery-div').remove();
                     $('.no-result').remove();
 
                     if (data.images != '') {
-                        $('#imagesFlex').append(data.images);
+                        $('#imagesGrid').append(data.images);
                         $('.endless-pagination').data('next-page', data.next_page);
-                        $('#imagesFlex').flexImages({ rowHeight: 320, truncate: false });
+                        // $('#imagesGrid').flexImages({ rowHeight: 320, truncate: false });
 
                         if (data.selected == 'latest') {
                             $('*[data-type="latest"]').addClass('underscored');

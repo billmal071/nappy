@@ -8,9 +8,9 @@
 
 @section('content')
 
-<div class="jumbotron md index-header jumbotron_set jumbotron-cover">
-      <div class="container wrap-jumbotron position-relative">
-        <h1 class="title-site title-sm">{{{ trans('auth.sign_up') }}}</h1>
+<div class="jumbotron index-header jumbotron_set jumbotron-cover position-relative">
+      <div class="container wrap-jumbotron">
+        <h1 class="title-site title-sm">{{ trans('auth.sign_up') }}</h1>
         {{-- <p class="subtitle-site"><strong>{{{$settings->title}}}</strong></p> --}}
         <span class="auth-photoby">
             Photo by <a class="" id="photoBy" href="#">@phabstudio</a>

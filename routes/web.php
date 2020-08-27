@@ -161,7 +161,6 @@ Route::get('ajax/user/images', 'AjaxController@userImages');
 Route::get('ajax/comments', 'AjaxController@comments');
 Route::get('ajax/premium', 'AjaxController@premium');
 
-
 /*
  |
  |-----------------------------------
@@ -169,19 +168,14 @@ Route::get('ajax/premium', 'AjaxController@premium');
  |--------- -------------------------
  */
 Route::group(['middleware' => 'auth'], function() {
-
-
-	//<---- Upload
-	 Route::get('upload', function(){
-
-	 if( Auth::user()->authorized_to_upload == 'yes' ) {
-	 	return view('images.upload');
-	 } else {
-	 	return redirect('/');
-	 }
-
-	});
-
+    // <---- Upload
+    Route::get('upload', function(){
+        if( Auth::user()->authorized_to_upload == 'yes' ) {
+            return view('images.upload');
+        } else {
+            return redirect('/');
+        }
+    });
 
 	// Edit Photo
 	Route::get('edit/photo/{id}','ImagesController@edit');

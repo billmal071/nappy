@@ -54,6 +54,7 @@
             data-img-id="{{ $image->id }}"
             data-w="{{$newWidth}}"
             data-h="{{$newHeight}}"
+            style="display: block; margin: 1rem 0;"
             class="item hovercard image-btn">
             <!-- hover-content -->
             <span class="hover-content">
@@ -106,3 +107,7 @@
         </a><!-- End Item -->
     @endif
 @endforeach
+@php
+    $imageCollection = 'img-collection.jpg';
+@endphp
+

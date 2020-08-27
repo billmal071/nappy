@@ -59,5 +59,6 @@ return [
     'error_logging'           =>      'These credentials do not match our records.',
     'login_download'          =>      'Please log-in for download',
     'join_now'                =>      'Join now',
-    'join'                    =>      'Join'
+    'join'                    =>      'Join',
+    'donate'                  =>      'Donate',
 ];

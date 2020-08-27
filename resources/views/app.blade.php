@@ -164,6 +164,35 @@
                     Cookies('cookiePolicySite', true);
                 });
             }
+
+            // [WIP - masonry layout]
+            // function resizeGridItem(item){
+            //     grid = document.getElementsByClassName("grid-gallery")[0];
+            //     rowHeight = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-auto-rows'));
+            //     rowGap = parseInt(window.getComputedStyle(grid).getPropertyValue('grid-row-gap'));
+            //     rowSpan = Math.ceil((item.getBoundingClientRect().height+rowGap)/(rowHeight+rowGap));
+            //     item.style.gridRowEnd = "span "+rowSpan;
+            // }
+
+            // function resizeAllGridItems(){
+            //     allItems = document.getElementsByClassName("item");
+            //     for(x=0;x<allItems.length;x++){
+            //     resizeGridItem(allItems[x]);
+            //     }
+            // }
+
+            // function resizeInstance(instance){
+            //     item = instance.elements[0];
+            //     resizeGridItem(item);
+            // }
+
+            // window.onload = resizeAllGridItems();
+            // window.addEventListener("resize", resizeAllGridItems);
+
+            // allItems = document.getElementsByClassName("item");
+            // for(x=0;x<allItems.length;x++){
+            //     imagesLoaded( allItems[x], resizeInstance);
+            // }
         });
 
         var goHistoryCount = 0;
@@ -178,10 +207,11 @@
             var imgDetailUrl = "{{ url('photo') }}/" + $(this).data('img-id');
 
             $.get('/photo/'+imgId, function(data){
-                let result = jQuery(data.detail).find("#test");
+                $("body").css({overflow: 'hidden'});
+                let result = jQuery(data.detail).find("#ajaxmodal");
                 $('#modal-body-id').children().remove();
-                $('#modalImageDeatails-btn').click();
                 $('#modal-body-id').append(result.prevObject[0]);
+                $('#modalImageDeatails-btn').click();
             });
 
             history.pushState("", "", "/photo/" + $(this).data('img-id'));
@@ -232,7 +262,8 @@
             var imgDetailUrl = rtUrl + prevId;
             $.get(imgDetailUrl, function(data){
                 $('#modal-body-id').children().remove();
-                $('#modal-body-id').append(data.detail);
+                let result = jQuery(data.detail).find("#ajaxmodal");
+                $('#modal-body-id').append(result.prevObject[0]);
                 $('.rel-flex-img').flexImages({ maxRows: 1, truncate: true });
                 goHistoryCount++;
                 history.pushState("", "", `/photo/${prevId}`);
@@ -263,7 +294,8 @@
             var imgDetailUrl = rtUrl + nextId;
                 $.get(imgDetailUrl, function(data){
                 $('#modal-body-id').children().remove();
-                $('#modal-body-id').append(data.detail);
+                let result = jQuery(data.detail).find("#ajaxmodal");
+                $('#modal-body-id').append(result.prevObject[0]);
                 $('.rel-flex-img').flexImages({ maxRows: 1, truncate: true });
                 goHistoryCount++;
                 history.pushState("", "", `/photo/${nextId}`);
@@ -298,6 +330,7 @@
                 }
             });
         });
+
     </script>
 </body>
 </html>

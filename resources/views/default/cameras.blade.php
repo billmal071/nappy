@@ -3,8 +3,8 @@
 @section('title'){{ $title.' - ' }}@endsection
 
 @section('content')
-<div class="jumbotron md header-cameras jumbotron_set jumbotron-cover">
-      <div class="container wrap-jumbotron position-relative">
+<div class="jumbotron md header-cameras jumbotron_set jumbotron-cover position-relative">
+      <div class="container wrap-jumbotron">
 
         <h1 class="title-site title-sm">{{ ucfirst($camera) }}</h1>
 

@@ -83,7 +83,12 @@ class UserController extends Controller
         if( $uri != $uriCanonical ) {
             return redirect($uriCanonical);
         }
-         return view('users.profile', [ 'user' => $user ,'title' => $title, 'images' => $images] );
+
+        return view('users.profile', [
+            'user' => $user,
+            'title' => $title,
+            'images' => $images
+        ]);
     }//<--- End Method
 
     public function followers($slug, Request $request)

@@ -3,8 +3,8 @@
 @section('title'){{ $response->title.' - ' }}@endsection
 
 @section('content') 
-<div class="jumbotron md index-header jumbotron_set jumbotron-cover">
-      <div class="container wrap-jumbotron position-relative">
+<div class="jumbotron md index-header jumbotron_set jumbotron-cover position-relative">
+      <div class="container wrap-jumbotron">
         <h1 class="title-site">{{ $response->title }}</h1>
       </div>
     </div>

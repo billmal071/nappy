@@ -14,7 +14,9 @@
 		<div class="col-md-4">
 
 			<div class="block-block text-center margin-bottom-10">
-        		<img src="{{url('public/uploads/thumbnail', $data->thumbnail)}}" style="max-width:280px; border-radius:6px;">
+				<img
+					src="{{App\Helper::imgixUrl('path.thumbnail', $data->thumbnail)}}"
+					style="max-width:280px; border-radius:6px;">
         	</div>
 
 			<a href="{{url('photo',$data->id)}}" class="btn btn-block btn-success btn-lg margin-bottom-10 custom-rounded">{{trans('misc.view_photo')}} <i class="fa fa-long-arrow-right"></i></a>

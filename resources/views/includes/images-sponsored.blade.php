@@ -18,7 +18,11 @@
     data-w="300"
     data-h="200"
 >
-        <img src="{{$imgSrc}}" class="previewImage"/>
+    <img
+        {{-- style="object-fit: cover;" --}}
+        loading="lazy"
+        src="{{$imgSrc}}"
+        class="previewImage"/>
 </a>
 <!-- End Item -->
 @endforeach

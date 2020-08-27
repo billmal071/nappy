@@ -1,10 +1,12 @@
-<?php
-$userAuth = Auth::user();
-if( Auth::check() ) {
-    // Notifications
-    $notifications_count = App\Models\Notifications::where('destination',Auth::user()->id)->where('status','0')->count();
-}
-?>
+@php
+    $userAuth = Auth::user();
+    if( Auth::check() ) {
+        // Notifications
+        $notifications_count = App\Models\Notifications::where('destination',Auth::user()->id)
+                                ->where('status','0')
+                                ->count();
+    }
+@endphp
 
 <div class="btn-block text-center class-montserrat showBanner padding-top-10 padding-bottom-10" style="display:none;">
     {{trans('misc.cookies_text')}}
@@ -14,29 +16,25 @@ if( Auth::check() ) {
 </div>
 
 <div class="navbar navbar-default navBar">
-      <div class="container">
+    <div class="container">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
 
-             <?php if( isset( $totalNotify ) ) : ?>
-            <span class="notify notifyResponsive"><?php echo $totalNotify; ?></span>
-            <?php endif; ?>
+                <?php if( isset( $totalNotify ) ) : ?>
+                    <span class="notify notifyResponsive"><?php echo $totalNotify; ?></span>
+                <?php endif; ?>
 
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="{{ url('/') }}">
-            <img src="{{ asset('public/img/Nappy.png') }}" class="logo" />
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="{{ url('/') }}">
+                <img src="{{ asset('public/img/Nappy.png') }}" class="logo" />
             </a>
         </div><!-- navbar-header -->
 
-
-
         <div class="navbar-collapse collapse">
-
             <ul class="nav navbar-nav navbar-right margin-bottom-zero">
-
                 {{-- @if(!Request::is('/') && !Request::is('search/*')) --}}
                 <li id="li-search">
                     <a class="color-default font-default text-capitalize" id="btnExpand" data-toggle="collapse" href="#formShow" aria-expanded="false" aria-controls="form_Show">
@@ -46,21 +44,115 @@ if( Auth::check() ) {
                 {{-- @endif --}}
 
                 @if($settings->sell_option == 'on')
-                 <li>
-                    <a href="{{url('photos/premium')}}" class="font-default text-capitalize">
-                        {{trans('misc.premium')}}
-                    </a>
-                </li>
+                    <li>
+                        <a href="{{url('photos/premium')}}" class="font-default text-capitalize">
+                            {{trans('misc.premium')}}
+                        </a>
+                    </li>
                 @endif
 
+                {{--
                 @if( Auth::check() )
+                    <li>
+                        <a href="{{url('feed')}}" class="font-default text-capitalize">
+                            {{trans('misc.feed')}}
+                        </a>
+                    </li>
+                @endif
+                --}}
+
+                <li class="dropdown">
+                    <a
+                        href="javascript:void(0);"
+                        class="font-default text-capitalize"
+                        data-toggle="dropdown">
+                        {{trans('misc.explore')}}
+                        <i class="ion-chevron-down margin-lft5"></i>
+                    </a>
+
+                        <!-- DROPDOWN MENU -->
+                    <ul class="dropdown-menu arrow-up nav-session" role="menu" aria-labelledby="dropdownMenu2">
+                        <li>
+                            @if(Auth::check())
+                                <a href="{{ url($userAuth->username.'/collections') }}" class="text-overflow">
+                                    Collections
+                                </a>
+                            @else
+                                <a href="{{ url('collections') }}" class="text-overflow">
+                                    Collections
+                                </a>
+                            @endif
+                        </li>
+                        <li>
+                            <a href="{{ url('members') }}" class="text-overflow">
+                                Members
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('categories') }}" class="text-overflow">
+                                Categories
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('requests') }}" class="text-overflow">
+                                Photo Request
+                            </a>
+                        </li>
+                    </ul><!-- DROPDOWN MENU -->
+                </li>
+
                 <li>
-                    <a href="{{url('feed')}}" class="font-default text-capitalize">
-                        {{trans('misc.feed')}}
+                    <a href="{{url('studio')}}" class="font-default text-capitalize">
+                        {{trans('misc.studio')}}
                     </a>
                 </li>
-                @endif
 
+                <li class="dropdown">
+                    <a
+                        href="javascript:void(0);"
+                        class="font-default text-capitalize"
+                        data-toggle="dropdown">
+                        {{trans('misc.about')}}
+                        <i class="ion-chevron-down margin-lft5"></i>
+                    </a>
+
+                        <!-- DROPDOWN MENU -->
+                    <ul class="dropdown-menu arrow-up nav-session" role="menu" aria-labelledby="dropdownMenu2">
+                        <li>
+                            <a href="{{ url('why-nappy') }}" class="text-overflow">
+                                Why Nappy
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('license') }}" class="text-overflow">
+                                License
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('faq') }}" class="text-overflow">
+                                FAQ
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('press') }}" class="text-overflow">
+                                Press
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('contact') }}" class="text-overflow">
+                                Contact
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url('by-shade') }}" class="text-overflow">
+                                By SHADE
+                            </a>
+                        </li>
+
+                    </ul><!-- DROPDOWN MENU -->
+                </li>
+
+                {{--
                 <li class="dropdown">
                     <a href="javascript:void(0);" class="font-default text-capitalize" data-toggle="dropdown">{{trans('misc.explore')}}
                         <i class="ion-chevron-down margin-lft5"></i>
@@ -78,9 +170,15 @@ if( Auth::check() ) {
                     </ul><!-- DROPDOWN MENU -->
 
                 </li>
+                --}}
 
+                {{--
                 <li class="dropdown">
-                    <a href="javascript:void(0);" class="font-default text-capitalize" data-toggle="dropdown">{{trans('misc.categories')}}
+                    <a
+                        href="javascript:void(0);"
+                        class="font-default text-capitalize"
+                        data-toggle="dropdown">
+                        {{trans('misc.categories')}}
                         <i class="ion-chevron-down margin-lft5"></i>
                     </a>
 
@@ -103,19 +201,22 @@ if( Auth::check() ) {
                         @endif
                     </ul><!-- DROPDOWN MENU -->
                 </li>
+                --}}
 
                 @if( Auth::check() )
+                    <li>
+                        <span class="notify @if( $notifications_count != 0 ) displayBlock @endif" id="noti_connect">@if( $notifications_count != 0 ) {{ $notifications_count }} @endif</span>
+                        <a href="{{ url('notifications') }}" title="{{ trans('users.notifications') }}" class="font-default text-capitalize">
+                            <i class="fa fa-bell-o"></i>
+                            <span class="title-dropdown">{{ trans('users.notifications') }}</span>
+                            </a>
+                    </li><!-- NOTY -->
 
-                <li>
-                    <span class="notify @if( $notifications_count != 0 ) displayBlock @endif" id="noti_connect">@if( $notifications_count != 0 ) {{ $notifications_count }} @endif</span>
-                    <a href="{{ url('notifications') }}" title="{{ trans('users.notifications') }}" class="font-default text-capitalize">
-                        <i class="fa fa-bell-o"></i>
-                        <span class="title-dropdown">{{ trans('users.notifications') }}</span>
-                        </a>
-                </li><!-- NOTY -->
-
-                <li class="dropdown">
-                      <a href="javascript:void(0);" data-toggle="dropdown" class="userAvatar myprofile dropdown-toggle font-default text-capitalize">
+                    <li class="dropdown">
+                        <a
+                            href="javascript:void(0);"
+                            data-toggle="dropdown"
+                            class="userAvatar myprofile dropdown-toggle font-default text-capitalize">
                             {{-- <img src="{{ asset('public/avatar').'/'.$userAuth->avatar }}" alt="User" class="img-circle avatarUser" width="21" height="21"> --}}
                             <img
                                 loading="lazy"
@@ -132,116 +233,144 @@ if( Auth::check() ) {
                             <i class="ion-chevron-down margin-lft5"></i>
                         </a>
 
-                      <!-- DROPDOWN MENU -->
-                      <ul class="dropdown-menu dd-close arrow-up nav-session" role="menu" aria-labelledby="dropdownMenu4">
+                        <!-- DROPDOWN MENU -->
+                        <ul class="dropdown-menu dd-close arrow-up nav-session" role="menu" aria-labelledby="dropdownMenu4">
 
-
-                    @if( $userAuth->role == 'admin' )
-                        <li>
-                            <a href="{{ url('panel/admin') }}" class="text-overflow">
-                                <i class="icon icon-Speedometter myicon-right"></i>
-                                {{ trans('admin.admin') }}
-                            </a>
-                        </li>
-                        <li role="separator" class="divider"></li>
-                    @endif
-
-                                    @if($settings->sell_option == 'on')
-                                    <li>
-                                        <span class="balance text-overflow">
-                                            <i class="fa fa-dollar myicon-right"></i> {{ trans('misc.balance') }} <strong>{{\App\Helper::amountFormatDecimal(Auth::user()->balance)}}</strong>
-                                        </span>
-                                            </li>
-
-                                    <li>
-                            <span class="balance text-overflow">
-                                <i class="icon icon-Dollars myicon-right"></i> {{ trans('misc.funds') }} <strong>{{\App\Helper::amountFormatDecimal(Auth::user()->funds)}}</strong>
-                                        </span>
-                                </li>
-
-                                            <li role="separator" class="divider"></li>
-
-                                    <li>
-                            <a href="{{ url('user/dashboard') }}" class="text-overflow">
-                                <i class="icon icon-Speedometter myicon-right"></i> {{ trans('admin.dashboard') }}</a>
-                                </li>
-
-                                            <li>
-                                    <a href="{{ url('user/dashboard/add/funds') }}" class="text-overflow">
-                                        <i class="icon icon-Dollars myicon-right"></i> {{ trans('misc.add_funds') }}</a>
-                                    </li>
-
-                                                <li>
-                                        <a href="{{ url('user/dashboard/withdrawals') }}" class="text-overflow">
-                                            <i class="icon icon-Bag myicon-right"></i> {{ trans('misc.withdraw_balance') }}</a>
-                                        </li>
-
-                                                    <li role="separator" class="divider"></li>
-                                            @endif
-
-                                            <li>
-                                    <a href="{{ url($userAuth->username) }}" class="myprofile text-overflow">
-                                        <i class="icon icon-User myicon-right"></i> {{ trans('users.my_profile') }}
+                            @if( $userAuth->role == 'admin' )
+                                <li>
+                                    <a href="{{ url('panel/admin') }}" class="text-overflow">
+                                        <i class="icon icon-Speedometter myicon-right"></i>
+                                        {{ trans('admin.admin') }}
                                     </a>
-                                    </li>
+                                </li>
+                                <li role="separator" class="divider"></li>
+                            @endif
 
-                                                <li>
-                                        <a href="{{ url($userAuth->username,'collections') }}">
-                                        <i class="fa fa-folder-open-o myicon-right"></i> {{ trans('misc.collections') }}
-                                        </a>
-                                                </li>
+                            @if($settings->sell_option == 'on')
+                                <li>
+                                    <span class="balance text-overflow">
+                                        <i class="fa fa-dollar myicon-right"></i>
+                                        {{ trans('misc.balance') }}
+                                        <strong>
+                                            {{\App\Helper::amountFormatDecimal(Auth::user()->balance)}}
+                                        </strong>
+                                    </span>
+                                </li>
+
+                                <li>
+                                    <span class="balance text-overflow">
+                                        <i class="icon icon-Dollars myicon-right"></i>
+                                        {{ trans('misc.funds') }}
+                                        <strong>
+                                            {{\App\Helper::amountFormatDecimal(Auth::user()->funds)}}
+                                        </strong>
+                                    </span>
+                                </li>
+
+                                <li role="separator" class="divider"></li>
+
+                                <li>
+                                    <a href="{{ url('user/dashboard') }}" class="text-overflow">
+                                        <i class="icon icon-Speedometter myicon-right"></i>
+                                        {{ trans('admin.dashboard') }}
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ url('user/dashboard/add/funds') }}" class="text-overflow">
+                                        <i class="icon icon-Dollars myicon-right"></i>
+                                        {{ trans('misc.add_funds') }}
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a href="{{ url('user/dashboard/withdrawals') }}" class="text-overflow">
+                                        <i class="icon icon-Bag myicon-right"></i>
+                                        {{ trans('misc.withdraw_balance') }}
+                                    </a>
+                                </li>
+
+                                <li role="separator" class="divider"></li>
+                            @endif
+
+                            <li>
+                                <a href="{{ url($userAuth->username) }}" class="myprofile text-overflow">
+                                    <i class="icon icon-User myicon-right"></i>
+                                    {{ trans('users.my_profile') }}
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="{{ url($userAuth->username,'collections') }}">
+                                    <i class="fa fa-folder-open-o myicon-right"></i>
+                                    {{ trans('misc.collections') }}
+                                </a>
+                            </li>
 
                             <li>
                                 <a href="{{ url('likes') }}" class="text-overflow">
-                                    <i class="icon icon-Heart myicon-right"></i> {{ trans('users.likes') }}
-                                    </a>
-                                </li>
+                                    <i class="icon icon-Heart myicon-right"></i>
+                                    {{ trans('users.likes') }}
+                                </a>
+                            </li>
 
                             <li>
                                 <a href="{{ url('account') }}" class="text-overflow">
-                                    <i class="icon icon-Settings myicon-right"></i> {{ trans('users.account_settings') }}
-                                    </a>
-                                </li>
+                                    <i class="icon icon-Settings myicon-right"></i>
+                                    {{ trans('users.account_settings') }}
+                                </a>
+                            </li>
+
                             <li>
                                 <a href="{{ url('logout') }}" class="logout text-overflow">
-                                    <i class="icon icon-Exit myicon-right"></i> {{ trans('users.logout') }}
+                                    <i class="icon icon-Exit myicon-right"></i>
+                                    {{ trans('users.logout') }}
                                 </a>
                             </li>
 
                         </ul><!-- DROPDOWN MENU -->
 
-                </li>
+                    </li>
 
-                @if( Auth::user()->authorized_to_upload == 'yes' )
-                <li>
-                    <a class="btn font-default text-capitalize bordered-btn" href="{{ url('upload') }}" title="{{ trans('users.upload') }}" style="border-color: black;">
-                        <span>{{ trans('users.submit') }}</span>
-                    </a>
-                </li>
-                @endif
-
-
+                    @if( Auth::user()->authorized_to_upload == 'yes' )
+                        <li>
+                            <a
+                                class="btn font-default text-capitalize bordered-btn"
+                                href="{{ url('upload') }}"
+                                title="{{ trans('users.upload') }}"
+                                style="border-color: black;">
+                                <span>
+                                    {{ trans('users.submit') }}
+                                </span>
+                            </a>
+                        </li>
+                    @endif
 
                 @else
-
-                @if( $settings->registration_active == '1' )
-                <li>
-                    <a class="btn font-default text-capitalize bordered-btn" href="{{ url('register') }}">
-                        <i class="glyphicon glyphicon-user"></i> {{ trans('auth.join') }}
-                    </a>
-                </li>
+                    @if( $settings->registration_active == '1' )
+                        <li>
+                            <a
+                                class="font-default text-capitalize"
+                                href="{{ url('register') }}">
+                                {{-- <i class="glyphicon glyphicon-user"></i> --}}
+                                {{ trans('auth.join') }}
+                            </a>
+                        </li>
+                    @endif
+                    <li>
+                        <a
+                            class="btn font-default text-capitalize bordered-btn"
+                            href="{{ url('upload') }}"
+                            onclick="history.pushState('','', '/upload')"
+                            title="{{ trans('users.upload') }}"
+                            style="border-color: black;">
+                            <span>
+                                {{ trans('users.submit') }}
+                            </span>
+                        </a>
+                    </li>
                 @endif
-
-                <li>
-                    <a class="font-default text-capitalize @if( $settings->registration_active == 0 ) log-in @endif" href="{{ url('login') }}" style="text-align: center;">
-                        {{ trans('auth.login') }}
-                    </a>
-                </li>
-              @endif
-          </ul>
-
-
-
-</div><!--/.navbar-collapse -->
-      </div>
+            </ul>
+        </div><!--/.navbar-collapse -->
     </div>
+</div>

@@ -7,8 +7,8 @@
 @endsection
 
 @section('content')
-<div class="jumbotron md index-header jumbotron_set jumbotron-cover">
-    <div class="container wrap-jumbotron position-relative">
+<div class="jumbotron md index-header jumbotron_set jumbotron-cover position-relative">
+    <div class="container wrap-jumbotron">
         <h1 class="title-site title-sm">{{ trans('misc.collection') }}</h1>
         <p class="subtitle-site margin-zero">
             <strong>{{ $collectionData->title  }} ({{number_format($images->total())}})</strong>

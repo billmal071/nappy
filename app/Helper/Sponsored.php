@@ -7,8 +7,8 @@ class Sponsored
     public static function getPhotos($phrase)
     {
        # Replace these values with your key and secret
-        $api_key = "r66t7n5bv5u5he8eyf2y7gbe";
-        $api_secret = "KEPkkHq24v8ZbUwYQ55kCEZ8j5K4GTEfkBtEXjCPvhsJB";
+        $api_key = env('GETTYIMAGES_API_KEY');
+        $api_secret = env('GETTYIMAGES_API_SECRET');
         // $phrase = "dog";
         // $phrase = $_GET["s"];
         $curl = curl_init();
